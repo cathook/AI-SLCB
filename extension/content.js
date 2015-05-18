@@ -10,10 +10,9 @@ content.initFunc = function() {
 //! @brief Extension's entry point.
 content.main = function() {
   var code = '';
-  code += 'var api = {};\n';
-  code += 'api.init = ' + api.init.toString() + ';\n';
+  code += content._dumpModule('api', api);
   code += 'window.onload = ' + content.initFunc.toString() + ';\n';
-  
+
   content._insertJS(code);
 };
 
@@ -27,6 +26,30 @@ content._insertJS = function(code) {
 
   var htmls = document.getElementsByTagName('html');
   htmls[htmls.length - 1].appendChild(script);
+};
+
+
+//! @brief Dumps all the functions in the gived module.
+//! @param [in] name Name of the module.
+//! @param [in] module The module object.
+content._dumpModule = function(name, module, noNeedInit) {
+  var ret = '';
+  if (noNeedInit !== true) {
+    ret += 'var ' + name + ' = ' + name + ' || {};\n';
+  }
+  for (var key in module) {
+    var subName = name + '.' + key;
+    if (typeof(module[key]) == 'function') {
+      ret += subName + ' = ' + module[key].toString() + ';\n';
+      ret += content._dumpModule(subName, module[key], true);
+    } else if (typeof(module[key]) == 'object' && module[key] !== null) {
+      ret += subName +  ' = {};\n';
+      ret += content._dumpModule(subName, module[key], true);
+    } else {
+      console.log('[ERROR] _dumpModule -- Unsupport type');
+    }
+  }
+  return ret;
 };
 
 
