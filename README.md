@@ -69,7 +69,7 @@ A Google Chrome extension for invincible AI on agar.io, a popular web-based game
 ## APIs for creating AI agent
 
 ```javascript
-function getPosition(); // Returns the absolute current self position.
+function getSelf(); // Returns the object of self.
 function getOpponents(); // Returns the list of positions and sizes of the opponents within eyesight.
 function getFoods(); // Returns the list of food objects.
 function getSpikes(); // Returns the list of spike objects.
