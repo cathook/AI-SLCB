@@ -1,4 +1,117 @@
-(function(f, r) {
+var api = api || {};  //!< namespace api
+
+
+//! Sets the target position.
+//! @param [in] pos A dict, which (pos.x, pos.y) be the position.
+//! @param [in] useWindowCoord An optional argument, specifies whether this
+//!    function should treat pos as the window coordinate or not.
+api.setTargetPos = function(pos, useWindowCoord) {
+  if (useWindowCoord === true) {
+    api._canvasOldEventHandlers.onmousemove(
+        {clientX : pos.x, clientY : pos.y});
+  } else {
+    api._canvasOldEventHandlers.onmousemove(
+        {clientX : (pos.x - s) * h + p / 2,
+         clientY : (pos.y - t) * h + m / 2});
+  }
+};
+
+
+//! Splits the agent.
+api.split = function() {
+  api._canvasOldEventHandlers.onkeydown({keyCode : 32});
+  window.setTimeout(
+      function() { api._canvasOldEventHandlers.onkeyup({keyCode : 32}); }, 100);
+};
+
+
+//! Lets the agent attack by throwing an little body.
+api.attack = function() {
+  api._canvasOldEventHandlers.onkeydown({keyCode : 87});
+  window.setTimeout(
+      function() { api._canvasOldEventHandlers.onkeyup({keyCode : 32}); }, 100);
+};
+
+
+//! Initializes all things.
+//! Including function/variable declarations.
+api.init = function() {
+  //! reference to the canvas tag, it will be initialized in originalInit().
+  api._canvas = null;
+
+  //! contains all the original canvas' event handlers, inititialized in
+  //! _replaceCanvasEventHandlers().
+  api._canvasEventHandlers = {};
+
+  api.originalInit();
+
+  api._replaceCanvasEventHandlers();
+
+  window.onkeydown = api.keydownHandler;
+//  var p = document.getElementById('nick').parentNode.parentNode;
+//  p.onkeydown = function(e) { return false; }
+//  p.onkeyup = function(e) { return false; }
+};
+
+
+//! window's key down handler.
+api.keydownHandler = function(evt) {
+  if (evt.keyCode == 'M'.charCodeAt(0) ||
+      evt.keyCode == 'm'.charCodeAt(0)) {
+    api.keydownHandler._handlers.toggleMouseController();
+  } else if (evt.keyCode == 'A'.charCodeAt(0) ||
+             evt.keyCode == 'a'.charCodeAt(0)) {
+    api.keydownHandler._handlers.toggleKeyboardController();
+  }
+};
+
+
+//! Contains handlers of keydown event of window.
+api.keydownHandler._handlers = {};
+
+
+//! Toggle the controller of move action between user and the ai.
+api.keydownHandler._handlers.toggleMouseController = function() {
+  if (api._canvas.onmousemove == api._canvasEventHandlers.onmousemove) {
+    api._canvas.onmousemove = null;
+  } else {
+    api._canvas.onmousemove = api._canvasEventHandlers.onmousemove;
+  }
+};
+
+
+//! Toggle the controller of attack/split action between user and the ai.
+api.keydownHandler._handlers.toggleKeyboardController = function() {
+  if (api._canvas.onkeydown == api._canvasEventHandlers.onkeydown) {
+    api._canvas.onkeydown = null;
+    api._canvas.onkeyup = null;
+  } else {
+    api._canvas.onkeydown = api._canvasEventHandlers.onkeydown;
+    api._canvas.onkeyup = api._canvasEventHandlers.onkeyup;
+  }
+};
+
+
+//! Replaces the event handlers of canvas for disable the user's control.
+api._replaceCanvasEventHandlers = function() {
+  var events = ['mousedown', 'mousemove', 'mouseup',
+                'keydown', 'keyup',
+                'blur'];
+  api._canvasEventHandlers = {};
+  for (var i = 0; i < events.length; ++i) {
+    var e = 'on' + events[i];
+    api._canvasEventHandlers[e] = api._canvas[e];
+    api._canvas[e] = null;
+  }
+};
+
+
+//! The original initial function of agar.io.
+api.originalInit = function() {
+  f = window;
+  r = jQuery;
+
+  //! Initialize function, it will setup the event handlers.
   function ya() {
     ia();
     setInterval(ia, 18E4);
@@ -49,6 +162,8 @@
     setInterval(G, 40);
     ma(r("#region").val());
     r("#overlays").show()
+
+    api._canvas = z;  //!< initialize.
   }
 
   function za() {
@@ -437,6 +552,9 @@
   if ("agar.io" != f.location.hostname && "localhost" != f.location.hostname && "10.10.2.13" != f.location.hostname) f.location = "http://agar.io/";
   else if (f.top != f) f.top.location = "http://agar.io/";
   else {
+    // Known variables:
+    // p: canvas width
+    // m: canvas height
     var $, e, z, p, m, H = null,
       l = null,
       s = 0,
@@ -753,7 +871,8 @@
           return this._canvas
         }
       };
-      f.onload = ya
+
+      ya();
     }
   }
-})(window, jQuery);
+};
