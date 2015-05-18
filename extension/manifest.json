@@ -1,0 +1,18 @@
+{
+  "manifest_version" : 2,
+  "name" : "agar AI",
+  "version" : "0.0.1",
+  
+  "browser_action" : {
+    "default_title" : "meow",
+    "default_popup" : "popup.html"
+  },
+  
+  "content_scripts" : [
+    {
+      "matches" : ["http://agar.io/"],
+      "js" : ["content.js"],
+      "run_at" : "document_end"
+    }
+  ]
+}
