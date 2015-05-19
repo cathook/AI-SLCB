@@ -60,12 +60,15 @@ api.setTargetPosition = function(pos, useWindowCoord) {
     return;
   }
   if (useWindowCoord === true) {
-    api._canvasOldEventHandlers.onmousemove(
+    api._canvasEventHandlers.onmousemove(
         {clientX : pos.x, clientY : pos.y});
   } else {
-    api._canvasOldEventHandlers.onmousemove(
-        {clientX : (pos.x - s) * h + p / 2,
-         clientY : (pos.y - t) * h + m / 2});
+    var c = api._getWindowCenterCoord();
+    var s = api._getScale();
+    var r = api._getWindowRect();
+    api._canvasEventHandlers.onmousemove(
+        {clientX : (pos.x - c.x) * s + r.x / 2,
+         clientY : (pos.y - c.y) * s + r.y / 2});
   }
 };
 
@@ -75,9 +78,9 @@ api.split = function() {
   if (!api.hasOwnProperty('_initialized')) {
     return;
   }
-  api._canvasOldEventHandlers.onkeydown({keyCode : 32});
+  api._canvasEventHandlers.onkeydown({keyCode : 32});
   window.setTimeout(
-      function() { api._canvasOldEventHandlers.onkeyup({keyCode : 32}); }, 100);
+      function() { api._canvasEventHandlers.onkeyup({keyCode : 32}); }, 100);
 };
 
 
@@ -86,9 +89,9 @@ api.attack = function() {
   if (!api.hasOwnProperty('_initialized')) {
     return;
   }
-  api._canvasOldEventHandlers.onkeydown({keyCode : 87});
+  api._canvasEventHandlers.onkeydown({keyCode : 87});
   window.setTimeout(
-      function() { api._canvasOldEventHandlers.onkeyup({keyCode : 32}); }, 100);
+      function() { api._canvasEventHandlers.onkeyup({keyCode : 32}); }, 100);
 };
 
 
@@ -246,6 +249,12 @@ api._replaceCanvasEventHandlers = function() {
     api._canvas[e] = null;
   }
 };
+
+
+//! Gets the window center.
+api._getWindowCenterCoord = function() {
+  console.log('no implementation here');
+}
 
 
 //! Backdoors for the variable `q`.
@@ -788,6 +797,9 @@ api.originalInit = function() {
       ga = new Image;
 
     // Backdoors for access some variables.
+    api._getWindowCenterCoord = function() { return new api.Position(s, t); };
+    api._getScale = function() { return h; };
+    api._getWindowRect = function() { return new api.Position(p, m); };
     api._getListOfCircles = function() { return q; };
     api._getDictOfCircles = function() { return w; };
 

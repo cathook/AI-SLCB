@@ -12,17 +12,24 @@ ESIGUAY.run = function() {
   if (self.circles.length !== 0){
     var nearest = 0;
     var min = Infinity;
-    var myPos = api.getSelf().circles[0].position;
-    for (var i = 0 ; i < foods.length ; i++) {
-      var dis = ESIGUAY.dis2(foods[i].position, myPos);
-      if (dis < min) {
-        min = dis;
-        nearest = i;
+    var myPos = api.getSelf().circles[0].center;
+    console.log(myPos.x + ', ' + myPos.y);
+
+    if (foods.length > 0) {
+      for (var i = 0 ; i < foods.length ; i++) {
+        var dis = ESIGUAY.dis2(foods[i].center, myPos);
+        if (dis < min && dis > 0) {
+          min = dis;
+          nearest = i;
+        }
       }
+      console.log('ININ ' + foods[nearest].center.x + ',' + foods[nearest].center.y);    
+      api.setTargetPosition(foods[nearest].center);
+    } else {
+      api.setTargetPosition(new api.Position(0, 0));
     }
-    api.setTargetPosition(foods[i].position, true);
   }
-  window.setTimeout(ai.run, 500);
+  window.setTimeout(ESIGUAY.run, 500);
 };
 
 
