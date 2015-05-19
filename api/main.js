@@ -56,7 +56,7 @@ api.setSelfName = function(name) {
 //! @param [in] useWindowCoord An optional argument, specifies whether this
 //!    function should treat pos as the window coordinate or not.
 api.setTargetPosition = function(pos, useWindowCoord) {
-  if (!api.hasOwnProperty('_initialized')) {
+  if (!api.isInitialized() || api.isUserOwnMouse() == true) {
     return;
   }
   if (useWindowCoord === true) {
@@ -75,29 +75,29 @@ api.setTargetPosition = function(pos, useWindowCoord) {
 
 //! Splits the agent.
 api.split = function() {
-  if (!api.hasOwnProperty('_initialized')) {
+  if (!api.isInitialized()) {
     return;
   }
-  api._canvasEventHandlers.onkeydown({keyCode : 32});
+  api._windowEventHandlers.onkeydown({keyCode : 32});
   window.setTimeout(
-      function() { api._canvasEventHandlers.onkeyup({keyCode : 32}); }, 100);
+      function() { api._windowEventHandlers.onkeyup({keyCode : 32}); }, 100);
 };
 
 
 //! Lets the agent attack by throwing an little body.
 api.attack = function() {
-  if (!api.hasOwnProperty('_initialized')) {
+  if (!api.isInitialized()) {
     return;
   }
-  api._canvasEventHandlers.onkeydown({keyCode : 87});
+  api._windowEventHandlers.onkeydown({keyCode : 87});
   window.setTimeout(
-      function() { api._canvasEventHandlers.onkeyup({keyCode : 32}); }, 100);
+      function() { api._windowEventHandlers.onkeyup({keyCode : 32}); }, 100);
 };
 
 
 //! Gets the foods information.
 api.getFoods = function() {
-  if (!api.hasOwnProperty('_initialized')) {
+  if (!api.isInitialized()) {
     return [];
   }
   var circles = api._getListOfCircles();
@@ -115,7 +115,7 @@ api.getFoods = function() {
 
 //! Gets the foods information.
 api.getSpikes = function() {
-  if (!api.hasOwnProperty('_initialized')) {
+  if (!api.isInitialized()) {
     return [];
   }
   var circles = api._getListOfCircles();
@@ -133,7 +133,7 @@ api.getSpikes = function() {
 
 //! Gets the foods information.
 api.getSelf = function() {
-  if (!api.hasOwnProperty('_initialized')) {
+  if (!api.isInitialized()) {
     return new api.Player(api._name, []);
   }
   var circles = api._getListOfCircles();
@@ -152,7 +152,7 @@ api.getSelf = function() {
 
 //! Gets the foods information.
 api.getOpponents = function() {
-  if (!api.hasOwnProperty('_initialized')) {
+  if (!api.isInitialized()) {
     return [];
   }
   var circles = api._getListOfCircles();
@@ -176,6 +176,63 @@ api.getOpponents = function() {
 };
 
 
+//! Returns true if this api is initialized.
+api.isInitialized = function() {
+  return api.hasOwnProperty('_initialized');
+};
+
+
+//! Registers a keydown event handler for specify char.
+//!
+//! @param [in] chr The char.
+//! @param [in] handler The handler function.
+api.registerKeyboardHandler = function(chr, handler) {
+  if (typeof(chr) == 'string') {
+    for (var i = 0; i < chr.length; ++i) {
+      api.registerKeyboardHandler(chr.charCodeAt(i), handler);
+    }
+  } else {
+    api._keydownHandler.handlers[chr] = handler;
+  }
+};
+
+
+//! Toggle the controller of move action between user and the ai.
+api.toggleMouseController = function() {
+  if (!api.isInitialized()) {
+    return;
+  }
+  if (api._userControlMouse) {
+    api._canvas.onmousemove = null;
+    api._userControlMouse = false;
+  } else {
+    api._canvas.onmousemove = api._canvasEventHandlers.onmousemove;
+    api._userControlMouse = true;
+  }
+};
+
+
+//! Toggle the controller of attack/split action between user and the ai.
+api.toggleKeyboardController = function() {
+  if (!api.isInitialized()) {
+    return;
+  }
+  api._userControlKeyboard = !api._userControlKeyboard;
+};
+
+
+//! Checks whether the user has own the keyboard control permisson or not.
+api.isUserOwnMouse = function() {
+  return api._userControlMouse;
+}
+
+
+//! Checks whether the user has own the keyboard control permisson or not.
+api.isUserOwnKeyboard = function() {
+  return api._userControlKeyboard;
+}
+
+
 //! Initializes all things.
 //! Including function/variable declarations.
 api.init = function() {
@@ -183,78 +240,93 @@ api.init = function() {
   api._canvas = null;
 
   //! contains all the original canvas' event handlers, inititialized in
-  //! _replaceCanvasEventHandlers().
+  //! _replaceEventHandlers().
   api._canvasEventHandlers = {};
 
-  //! name of our circles, setup by `setName()` function.
+  //! contains all the original window's event handlers, inititialized in
+  //! _replaceEventHandlers().
+  api._windowEventHandlers = {};
+
+  //! name of our circles, setup by `setSelfName()` function.
   api._name = null;
+
+  //! whether the user own the control permission of the mouse.
+  api._userControlMouse = false;
+
+  //! whether the user own the control permission of the keyboard.
+  api._userControlKeyboard = false;
 
   api.originalInit();
 
-  api._replaceCanvasEventHandlers();
+  api._replaceEventHandlers();
 
-  window.onkeydown = api.keydownHandler;
-  
+  window.onkeydown = api._keydownHandler;
+  window.onkeyup = api._keyupHandler;
+  api.registerKeyboardHandler('mM', api.toggleMouseController);
+  api.registerKeyboardHandler('aA', api.toggleKeyboardController);
+
   api._initialized = true;
 };
 
 
-//! window's key down handler.
-api.keydownHandler = function(evt) {
-  if (evt.keyCode == 'M'.charCodeAt(0) ||
-      evt.keyCode == 'm'.charCodeAt(0)) {
-    api.keydownHandler._handlers.toggleMouseController();
-  } else if (evt.keyCode == 'A'.charCodeAt(0) ||
-             evt.keyCode == 'a'.charCodeAt(0)) {
-    api.keydownHandler._handlers.toggleKeyboardController();
-  }
-};
-
-
-//! Contains handlers of keydown event of window.
-api.keydownHandler._handlers = {};
-
-
-//! Toggle the controller of move action between user and the ai.
-api.keydownHandler._handlers.toggleMouseController = function() {
-  if (api._canvas.onmousemove == api._canvasEventHandlers.onmousemove) {
-    api._canvas.onmousemove = null;
-  } else {
-    api._canvas.onmousemove = api._canvasEventHandlers.onmousemove;
-  }
-};
-
-
-//! Toggle the controller of attack/split action between user and the ai.
-api.keydownHandler._handlers.toggleKeyboardController = function() {
-  if (api._canvas.onkeydown == api._canvasEventHandlers.onkeydown) {
-    api._canvas.onkeydown = null;
-    api._canvas.onkeyup = null;
-  } else {
-    api._canvas.onkeydown = api._canvasEventHandlers.onkeydown;
-    api._canvas.onkeyup = api._canvasEventHandlers.onkeyup;
-  }
-};
-
-
 //! Replaces the event handlers of canvas for disable the user's control.
-api._replaceCanvasEventHandlers = function() {
-  var events = ['mousedown', 'mousemove', 'mouseup',
-                'keydown', 'keyup',
-                'blur'];
+api._replaceEventHandlers = function() {
   api._canvasEventHandlers = {};
-  for (var i = 0; i < events.length; ++i) {
-    var e = 'on' + events[i];
+  api._windowEventHandlers = {};
+  for (var i = 0, es = ['mousedown', 'mouseup', 'mousemove'];
+       i < es.length;
+       ++i) {
+    var e = 'on' + es[i];
     api._canvasEventHandlers[e] = api._canvas[e];
     api._canvas[e] = null;
   }
+  for (var i = 0, es = ['keydown', 'keyup', 'blur']; i < es.length; ++i) {
+    var e = 'on' + es[i];
+    api._windowEventHandlers[e] = window[e];
+    window[e] = null;
+  }
 };
+
+
+//! window's key down handler.
+api._keydownHandler = function(evt) {
+  if (api._keydownHandler.handlers.hasOwnProperty(evt.keyCode)) {
+    return api._keydownHandler.handlers[evt.keyCode](evt);
+  }
+  if (api.isUserOwnKeyboard()) {
+    return api._windowEventHandlers.onkeydown(evt);
+  }
+};
+
+
+//! window's key up handler.
+api._keyupHandler = function(evt) {
+  if (api.isUserOwnKeyboard()) {
+    return api._windowEventHandlers.onkeyup(evt);
+  }
+};
+
+
+//! handlers for specified key.
+api._keydownHandler.handlers = {};
 
 
 //! Gets the window center.
 api._getWindowCenterCoord = function() {
   console.log('no implementation here');
-}
+};
+
+
+//! Gets the scale factor.
+api._getScale = function() {
+  console.log('no implementation here');
+};
+
+
+//! Gets the window size (x = width, y = height).
+api._getWindowRect = function() {
+  console.log('no implementation here');
+};
 
 
 //! Backdoors for the variable `q`.
@@ -351,6 +423,11 @@ api.originalInit = function() {
   function aa() {
     Q = (O - p / 2) / h + s;
     R = (P - m / 2) / h + t
+//    console.log('win(' + O + ', ' + P + '), abs(' + Q + ', ' + R + ')');
+    var xx = api.getSelf().circles;
+    if (xx.length > 0) {
+//      console.log('my_(' + xx[0].center.x + ', ' + xx[0].center.y + ', ' + xx[0].radius + ')');
+    }
   }
 
   function ia() {
