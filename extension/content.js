@@ -4,6 +4,7 @@ var content = content || {};  //!< namespace content
 //! @brief Event handler for window's onload event.
 content.initFunc = function() {
   api.init();
+  ESIGUAY.init();
 };
 
 
@@ -11,6 +12,8 @@ content.initFunc = function() {
 content.main = function() {
   var code = '';
   code += content._dumpModule('api', api);
+  code += '\n';
+  code += content._dumpModule('ESIGUAY', ESIGUAY);
   code += 'window.onload = ' + content.initFunc.toString() + ';\n';
 
   content._insertJS(code);
