@@ -103,6 +103,18 @@ api._replaceCanvasEventHandlers = function() {
 };
 
 
+//! Backdoors for the variable `q`.
+api._getListOfCircles = function() {
+  console.log('no implementation here');
+};
+
+
+//! Backdoors for the variable `w`.
+api._getDictOfCircles = function() {
+  console.log('no implementation here');
+};
+
+
 //! The original initial function of agar.io.
 api.originalInit = function() {
   f = window;
@@ -350,11 +362,13 @@ api.originalInit = function() {
     }
   }
 
+  //! Sync the circles data.
   function Da(a) {
     E = +new Date;
     var b = Math.random(),
       c = 1;
     da = !1;
+    // deletes some circle.
     for (var d = a.getUint16(c, !0), c = c + 2, e = 0; e < d; ++e) {
       var k = w[a.getUint32(c, !0)],
         f = w[a.getUint32(c + 4, !0)],
@@ -362,6 +376,7 @@ api.originalInit = function() {
       k && f &&
         (f.destroy(), f.ox = f.x, f.oy = f.y, f.oSize = f.size, f.nx = k.x, f.ny = k.y, f.nSize = f.size, f.updateTime = E)
     }
+    // adds some circle.
     for (;;) {
       d = a.getUint32(c, !0);
       c += 4;
@@ -390,6 +405,7 @@ api.originalInit = function() {
       n.updateCode = b;
       n.updateTime = E; - 1 != B.indexOf(d) && -1 == g.indexOf(n) && (document.getElementById("overlays").style.display = "none", g.push(n), 1 == g.length && (s = n.x, t = n.y))
     }
+    // removes the old data.
     a.getUint16(c, !0);
     c += 2;
     k = a.getUint32(c, !0);
@@ -563,13 +579,15 @@ api.originalInit = function() {
     this.setName(f)
   }
 
+  //! A class for text block.
+  //! Use for "score", "name" of the agent...
   function Y(a, b, c, d) {
     a && (this._size = a);
     b && (this._color = b);
     this._stroke = !!c;
     d && (this._strokeColor = d)
   }
- 
+
   if ("agar.io" != f.location.hostname && "localhost" != f.location.hostname && "10.10.2.13" != f.location.hostname) f.location = "http://agar.io/";
   else if (f.top != f) f.top.location = "http://agar.io/";
   else {
@@ -581,6 +599,10 @@ api.originalInit = function() {
     // Q: absolute coordinate x
     // R: absoulte coordinate y
     // H: the quad-tree
+    // $, z: canvas
+    // e: canvas.getContex('2d')
+    // w: a dict stores circles
+    // q: a list stores circles
     var $, e, z, p, m, H = null,
       l = null,
       s = 0,
@@ -619,6 +641,11 @@ api.originalInit = function() {
       Ia = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
       ja = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
       ga = new Image;
+
+    // Backdoors for access some variables.
+    api._getListOfCircles = function() { return q; };
+    api._getDictOfCircles = function() { return w; };
+
     ga.src = "img/split.png";
     var xa = document.createElement("canvas");
     if ("undefined" == typeof console || "undefined" == typeof DataView || "undefined" == typeof WebSocket || null == xa || null == xa.getContext) alert("You browser does not support this game, we recommend you to use Firefox to play this");
