@@ -41,9 +41,9 @@ A Google Chrome extension for invincible AI on agar.io, a popular web-based game
 
 |Member|Responsibility|Priority|Done?|
 |:-----|:-------------|:------:|:---:|
-|sycLin|Complete the Interface|1|***not-yet***|
+|sycLin|Complete the Interface|1|*not-yet*|
 |lunaiovry|Complete the Interface|1|*not-yet*|
-|cathook|Build Framework for Interface|0|*not-yet*|
+|cathook|Build Framework for Interface|0|**DONE**|
 |benchou1919|Contruct a crazy AI|2|*not-yet*|
 
 
