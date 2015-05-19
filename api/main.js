@@ -48,9 +48,6 @@ api.init = function() {
   api._replaceCanvasEventHandlers();
 
   window.onkeydown = api.keydownHandler;
-//  var p = document.getElementById('nick').parentNode.parentNode;
-//  p.onkeydown = function(e) { return false; }
-//  p.onkeyup = function(e) { return false; }
 };
 
 
@@ -166,6 +163,8 @@ api.originalInit = function() {
     api._canvas = z;  //!< initialize.
   }
 
+  //! Creates a QUAD tree, put all data into it.
+  //! Called by `ba()`.
   function za() {
     if (.5 > h) H = null;
     else {
@@ -182,6 +181,7 @@ api.originalInit = function() {
     }
   }
 
+  //! Transform the window coordinate (O, P) to the absolute coordinate (Q, R)
   function aa() {
     Q = (O - p / 2) / h + s;
     R = (P - m / 2) / h + t
@@ -237,6 +237,9 @@ api.originalInit = function() {
     I && (r("#connecting").show(), oa())
   }
 
+  //! Connects to the websocket server.
+  //! Called by `oa()`
+  //! @param [in] a The server name.
   function pa(a) {
     if (l) {
       l.onopen = null;
@@ -266,6 +269,8 @@ api.originalInit = function() {
     }
   }
 
+  //! After the socket opened, do some initialize...
+  //! It is the onopen event handler for the websocket.
   function Aa(a) {
     r("#connecting").hide();
     console.log("socket open");
@@ -282,11 +287,14 @@ api.originalInit = function() {
     qa()
   }
 
+  //! Shows some message right after the websocket is closed.
+  //! It is the onclose event handler for the websocket.
   function Ca(a) {
     console.log("socket close");
     setTimeout(ca, 500)
   }
 
+  //! Message handler for the websocket.
   function Ba(a) {
     function b() {
       for (var a = "";;) {
@@ -391,6 +399,7 @@ api.originalInit = function() {
     da && 0 == g.length && r("#overlays").fadeIn(3E3)
   }
 
+  //! Sends some information to the websocket server...
   function G() {
     if (ea()) {
       var a = O - p / 2,
@@ -399,6 +408,7 @@ api.originalInit = function() {
     }
   }
 
+  //! Sends the array `N` to the server.
   function qa() {
     if (ea() && null != N) {
       var a = new ArrayBuffer(1 + 2 * N.length),
@@ -409,10 +419,12 @@ api.originalInit = function() {
     }
   }
 
+  //! Checks whether the websocket is opened or not.
   function ea() {
     return null != l && l.readyState == l.OPEN
   }
 
+  //! Sents a 8-bit int to the server.
   function A(a) {
     if (ea()) {
       var b = new ArrayBuffer(1);
@@ -421,11 +433,13 @@ api.originalInit = function() {
     }
   }
 
+  //! Drawing and drawing...
   function la() {
     ba();
     f.requestAnimationFrame(la)
   }
 
+  //! Resize event handler.
   function ka() {
     p = f.innerWidth;
     m = f.innerHeight;
@@ -442,6 +456,7 @@ api.originalInit = function() {
     }
   }
 
+  //! Something likes re-draw and update...
   function ba() {
     var a = +new Date;
     ++Fa;
@@ -488,6 +503,7 @@ api.originalInit = function() {
     1 < v && (v = 1)
   }
 
+  //! Called by `ba()`
   function Ha() {
     if (ja && ga.width) {
       var a = p / 5;
@@ -495,11 +511,15 @@ api.originalInit = function() {
     }
   }
 
+  //! Called by `ba()`, calculate something, seems that it is an area size.
   function Ga() {
     for (var a = 0, b = 0; b < g.length; b++) a += g[b].nSize * g[b].nSize;
     return a
   }
 
+  //! Renders the leaderboard.
+  //! Called by `Ba()`, seems that it will be called while the leaderboard
+  //! changed.
   function ra() {
     x = null;
     if (null != u || 0 != y.length)
@@ -549,12 +569,18 @@ api.originalInit = function() {
     this._stroke = !!c;
     d && (this._strokeColor = d)
   }
+ 
   if ("agar.io" != f.location.hostname && "localhost" != f.location.hostname && "10.10.2.13" != f.location.hostname) f.location = "http://agar.io/";
   else if (f.top != f) f.top.location = "http://agar.io/";
   else {
     // Known variables:
     // p: canvas width
     // m: canvas height
+    // O: window coordinate x
+    // P: window coordinate y
+    // Q: absolute coordinate x
+    // R: absoulte coordinate y
+    // H: the quad-tree
     var $, e, z, p, m, H = null,
       l = null,
       s = 0,
@@ -872,7 +898,7 @@ api.originalInit = function() {
         }
       };
 
-      ya();
+      ya();  //! Go!!
     }
   }
 };
