@@ -47,6 +47,7 @@ api.Player = function(name, circles) {
 //! @param [in] name The name.
 api.setSelfName = function(name) {
   api._name = name;
+  document.getElementById('nick').value = name;
 };
 
 
