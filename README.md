@@ -87,5 +87,5 @@ function nextPosition(); // Sends the next position to the server.
 |ZHIZHANGGUAY|makes random moves.|
 
 ## Coding style
-* [Google JavaScript coding style guide]: https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+* [Google JavaScript coding style guide](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xm)
 
