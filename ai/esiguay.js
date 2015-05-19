@@ -1,46 +1,50 @@
-var ESIGUAY = ESIGUAY || {};
+var ai = ai || {};  //!< namespace ai
+
+ai.esiguay = ai.esiguay || {};  //!< namespace ai.esiguay
 
 
-ESIGUAY.dis2 = function(a, b) {
-  return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+//! Starts to use this agent.
+ai.esiguay.start = function() {
+  ai.esiguay._runFlag = true;
+  ai.esiguay._run();
 };
 
 
-ESIGUAY.run = function() {
-  console.log('0000000000000000');
-  var goNext = function() { window.setTimeout(ESIGUAY.run, 500); };
-  if (!api.isInitialized()) {
-    goNext();
-    console.log('fuck');
+//! Stops this agent.
+ai.esiguay.stop = function() {
+  ai.esiguay._runFlag = false;
+}
+
+
+//! run...
+ai.esiguay._run = function() {
+  var goNext = function() { window.setTimeout(ai.esiguay._run, 500); };
+  if (ai.esiguay._runFlag !== true) {
+    return;
   }
 
   var self = api.getSelf();
   if (self.circles.length == 0) {
     goNext();
-    console.log('fuc2k');
+    return;
   }
 
   var foods = api.getFoods();
   if (foods.length == 0) {
     api.setTargetPosition(new api.Position(0, 0));
-    console.log('fuck3');
+    console.log('warning!! no food');
   } else {
-    var nearest = 0, min = Infinity;
+    var nearest = 0, mindist = Number.POSITIVE_INFINITY;
     for (var i = 0; i < foods.length; ++i) {
-      var dis = ESIGUAY.dis2(foods[i].center, self.circles[0].center);
-      if (dis < min) {
-        min = dis;
+      var dist = foods[i].center.minus(self.circles[0].center).length2();
+      if (dist < mindist) {
+        mindist = dist;
         nearest = i;
       }
     }
     api.setTargetPosition(foods[nearest].center);
-    console.log('target: (' + foods[nearest].center.x + ', ' + foods[nearest].center.y + ')');
+    console.log('target: ' + foods[nearest].center.toString());
   }
 
   goNext();
-};
-
-
-ESIGUAY.init = function() {
-  ESIGUAY.run();
 };

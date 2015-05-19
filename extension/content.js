@@ -4,16 +4,18 @@ var content = content || {};  //!< namespace content
 //! @brief Event handler for window's onload event.
 content.initFunc = function() {
   api.init();
-  ESIGUAY.init();
+  ai.esiguay.start();
+
+  api.setSelfName('default name');
 };
 
 
 //! @brief Extension's entry point.
 content.main = function() {
   var code = '';
+  code += content._dumpModule('util', util);
   code += content._dumpModule('api', api);
-  code += '\n';
-  code += content._dumpModule('ESIGUAY', ESIGUAY);
+  code += content._dumpModule('ai', ai);
   code += 'window.onload = ' + content.initFunc.toString() + ';\n';
 
   content._insertJS(code);
@@ -45,6 +47,8 @@ content._dumpModule = function(name, module, noNeedInit) {
     if (typeof(module[key]) == 'function') {
       ret += subName + ' = ' + module[key].toString() + ';\n';
       ret += content._dumpModule(subName, module[key], true);
+      ret += content._dumpModule(
+          subName + '.prototype', module[key].prototype, true);
     } else if (typeof(module[key]) == 'object' && module[key] !== null) {
       ret += subName +  ' = {};\n';
       ret += content._dumpModule(subName, module[key], true);

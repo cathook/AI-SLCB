@@ -9,10 +9,7 @@ var api = api || {};  //!< namespace api
 //!
 //! @param [in] x The x coordinate.
 //! @param [in] y The y coordinate.
-api.Position = function(x, y) {
-  this.x = x;
-  this.y = y;
-};
+api.Position = util.Vector2D;
 
 
 //! A circle structure.
@@ -100,14 +97,15 @@ api.getFoods = function() {
   if (!api.isInitialized()) {
     return [];
   }
-  var circles = api._getListOfCircles();
+  var r = Number.POSITIVE_INFINITY;
+  for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
+    r = Math.min(r, cs[i].size);
+  }
   var ret = [];
-  for (var i = 0; i < circles.length; ++i) {
-    if (circles[i].isAgitated || circles[i].isVirus) {
-      continue;
+  for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
+    if (!cs[i].isVirus && !api._isOurCircle(cs[i]) && cs[i].size < r) {
+      ret.push(new api.Circle(new api.Position(cs[i].x, cs[i].y),cs[i].size));
     }
-    ret.push(new api.Circle(
-        new api.Position(circles[i].x, circles[i].y),circles[i].size));
   }
   return ret;
 };
@@ -118,14 +116,11 @@ api.getSpikes = function() {
   if (!api.isInitialized()) {
     return [];
   }
-  var circles = api._getListOfCircles();
   var ret = [];
-  for (var i = 0; i < circles.length; ++i) {
-    if (!circles[i].isVirus) {
-      continue;
+  for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
+    if (cs[i].isVirus) {
+      ret.push(new api.Circle(new api.Position(cs[i].x, cs[i].y), cs[i].size));
     }
-    ret.push(new api.Circle(new api.Position(circles[i].x, circles[i].y),
-                            circles[i].size));
   }
   return ret;
 };
@@ -136,15 +131,10 @@ api.getSelf = function() {
   if (!api.isInitialized()) {
     return new api.Player(api._name, []);
   }
-  var circles = api._getListOfCircles();
   var selfCircles = [];
-  for (var i = 0; i < circles.length; ++i) {
-    if (circles[i].isAgitated || circles[i].isVirus ||
-        circles[i].name != api._name) {
-      continue;
-    }
+  for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
     selfCircles.push(new api.Circle(
-        new api.Position(circles[i].x, circles[i].y), circles[i].size));
+        new api.Position(cs[i].x, cs[i].y), cs[i].size));
   }
   return new api.Player(api._name, selfCircles);
 };
@@ -155,18 +145,15 @@ api.getOpponents = function() {
   if (!api.isInitialized()) {
     return [];
   }
-  var circles = api._getListOfCircles();
   var players = {};
-  for (var i = 0; i < circles.length; ++i) {
-    if (circles[i].isAgitated || circles[i].isVirus ||
-        circles[i].name == api._name) {
-      continue;
+  for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
+    if (!cs[i].isVirus && !api._isOurCircle(cs[i])) {
+      if (!players.hasOwnProperty(cs[i].name)) {
+        players[cs[i].name] = [];
+      }
+      players[cs[i].name].push(new api.Circle(
+          new api.Position(cs[i].x, cs[i].y), cs[i].size));
     }
-    if (!players.hasOwnProperty(circles[i].name)) {
-      players[circles[i].name] = [];
-    }
-    players[circles[i].name].push(new api.Circle(
-        new api.Position(circles[i].x, circles[i].y), circles[i].size));
   }
   var ret = [];
   for (var name in players) {
@@ -178,7 +165,7 @@ api.getOpponents = function() {
 
 //! Returns true if this api is initialized.
 api.isInitialized = function() {
-  return api.hasOwnProperty('_initialized');
+  return api._initialized === true;
 };
 
 
@@ -311,6 +298,13 @@ api._keyupHandler = function(evt) {
 api._keydownHandler.handlers = {};
 
 
+//! Checks whether the gived circle is our body or not.
+//! @param [in] c The circle to be checked.
+api._isOurCircle = function(c) {
+  return (api._getListOfOurCircles().indexOf(c) >= 0);
+};
+
+
 //! Gets the window center.
 api._getWindowCenterCoord = function() {
   console.log('no implementation here');
@@ -337,6 +331,12 @@ api._getListOfCircles = function() {
 
 //! Backdoors for the variable `w`.
 api._getDictOfCircles = function() {
+  console.log('no implementation here');
+};
+
+
+//! Backdoors for the variable `g`.
+api._getListOfOurCircles = function() {
   console.log('no implementation here');
 };
 
@@ -423,11 +423,6 @@ api.originalInit = function() {
   function aa() {
     Q = (O - p / 2) / h + s;
     R = (P - m / 2) / h + t
-//    console.log('win(' + O + ', ' + P + '), abs(' + Q + ', ' + R + ')');
-    var xx = api.getSelf().circles;
-    if (xx.length > 0) {
-//      console.log('my_(' + xx[0].center.x + ', ' + xx[0].center.y + ', ' + xx[0].radius + ')');
-    }
   }
 
   function ia() {
@@ -634,7 +629,17 @@ api.originalInit = function() {
       n.ny = k;
       n.nSize = f;
       n.updateCode = b;
-      n.updateTime = E; - 1 != B.indexOf(d) && -1 == g.indexOf(n) && (document.getElementById("overlays").style.display = "none", g.push(n), 1 == g.length && (s = n.x, t = n.y))
+      n.updateTime = E;
+
+      // seems like a special case for entering the game...
+      if (B.indexOf(d) != -1 && g.indexOf(n) == -1) {
+        document.getElementById("overlays").style.display = "none";
+        g.push(n);
+        if (g.length == 1) {
+          s = n.x;
+          t = n.y;
+        }
+      }
     }
     // removes the old data.
     a.getUint16(c, !0);
@@ -758,7 +763,7 @@ api.originalInit = function() {
     }
   }
 
-  //! Called by `ba()`, calculate something, seems that it is an area size.
+  //! Called by `ba()`, calculate the sum of areas of our circles.
   function Ga() {
     for (var a = 0, b = 0; b < g.length; b++) a += g[b].nSize * g[b].nSize;
     return a
@@ -832,8 +837,11 @@ api.originalInit = function() {
     // H: the quad-tree
     // $, z: canvas
     // e: canvas.getContex('2d')
+    // g: a list stores our player's circles
     // w: a dict stores circles
     // q: a list stores circles
+    // C: for garbage (the one who is destroyed...)
+    // y: members in the leader board.
     var $, e, z, p, m, H = null,
       l = null,
       s = 0,
@@ -879,6 +887,7 @@ api.originalInit = function() {
     api._getWindowRect = function() { return new api.Position(p, m); };
     api._getListOfCircles = function() { return q; };
     api._getDictOfCircles = function() { return w; };
+    api._getListOfOurCircles = function() { return g; };
 
     ga.src = "img/split.png";
     var xa = document.createElement("canvas");

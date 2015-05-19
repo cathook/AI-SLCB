@@ -6,6 +6,7 @@ STATIC_FILES = extension/manifest.json extension/popup.html
 CONTENT_JS = extension/content.js
 
 OUR_AGAR_JS = \
+    $(shell find lib -regex '.*\.js' 2>/dev/null) \
     $(shell find api -regex '.*\.js' 2>/dev/null) \
     $(shell find ai -regex '.*\.js' 2>/dev/null)
 
