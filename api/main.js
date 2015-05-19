@@ -56,6 +56,9 @@ api.setSelfName = function(name) {
 //! @param [in] useWindowCoord An optional argument, specifies whether this
 //!    function should treat pos as the window coordinate or not.
 api.setTargetPosition = function(pos, useWindowCoord) {
+  if (!api.hasOwnProperty('_initialized')) {
+    return;
+  }
   if (useWindowCoord === true) {
     api._canvasOldEventHandlers.onmousemove(
         {clientX : pos.x, clientY : pos.y});
@@ -69,6 +72,9 @@ api.setTargetPosition = function(pos, useWindowCoord) {
 
 //! Splits the agent.
 api.split = function() {
+  if (!api.hasOwnProperty('_initialized')) {
+    return;
+  }
   api._canvasOldEventHandlers.onkeydown({keyCode : 32});
   window.setTimeout(
       function() { api._canvasOldEventHandlers.onkeyup({keyCode : 32}); }, 100);
@@ -77,6 +83,9 @@ api.split = function() {
 
 //! Lets the agent attack by throwing an little body.
 api.attack = function() {
+  if (!api.hasOwnProperty('_initialized')) {
+    return;
+  }
   api._canvasOldEventHandlers.onkeydown({keyCode : 87});
   window.setTimeout(
       function() { api._canvasOldEventHandlers.onkeyup({keyCode : 32}); }, 100);
@@ -85,6 +94,9 @@ api.attack = function() {
 
 //! Gets the foods information.
 api.getFoods = function() {
+  if (!api.hasOwnProperty('_initialized')) {
+    return [];
+  }
   var circles = api._getListOfCircles();
   var ret = [];
   for (var i = 0; i < circles.length; ++i) {
@@ -100,6 +112,9 @@ api.getFoods = function() {
 
 //! Gets the foods information.
 api.getSpikes = function() {
+  if (!api.hasOwnProperty('_initialized')) {
+    return [];
+  }
   var circles = api._getListOfCircles();
   var ret = [];
   for (var i = 0; i < circles.length; ++i) {
@@ -115,6 +130,9 @@ api.getSpikes = function() {
 
 //! Gets the foods information.
 api.getSelf = function() {
+  if (!api.hasOwnProperty('_initialized')) {
+    return new api.Player(api._name, []);
+  }
   var circles = api._getListOfCircles();
   var selfCircles = [];
   for (var i = 0; i < circles.length; ++i) {
@@ -131,6 +149,9 @@ api.getSelf = function() {
 
 //! Gets the foods information.
 api.getOpponents = function() {
+  if (!api.hasOwnProperty('_initialized')) {
+    return [];
+  }
   var circles = api._getListOfCircles();
   var players = {};
   for (var i = 0; i < circles.length; ++i) {
@@ -170,6 +191,8 @@ api.init = function() {
   api._replaceCanvasEventHandlers();
 
   window.onkeydown = api.keydownHandler;
+  
+  api._initialized = true;
 };
 
 
