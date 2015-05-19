@@ -1,11 +1,74 @@
 var api = api || {};  //!< namespace api
 
 
+//! 2D position structure.
+//!
+//! struct variables:
+//!   x: the x-coordinate.
+//!   y: the y-coordinate.
+//!
+//! @param [in] x The x coordinate.
+//! @param [in] y The y coordinate.
+api.Position = function(x, y) {
+  this.x = x;
+  this.y = y;
+};
+
+
+//! A food structure.
+//!
+//! struct variables:
+//!   position: An instance of `api.Position`, the position of this food.
+//!   size: Size of the food.
+//!
+//! @param [in] pos The position of the food.
+//! @param [in] size The size of the food.
+api.Food = function(pos, size) {
+  this.position = pos;
+  this.size = size;
+};
+
+
+//! A circle structure.
+//!
+//! struct variables:
+//!   center: An instance of `api.Position`, the center of this circle.
+//!   radius: Radius of the circle.
+//!
+//! @param [in] center The center of the circle.
+//! @param [in] radius The radius of the circle.
+api.Circle = function(center, radius) {
+  this.center = center;
+  this.radius = radius;
+};
+
+
+//! A player.
+//!
+//! struct variables:
+//!   name: The name of this player.
+//!   circles: A list of circle, body of this player.
+//!
+//! @param [in] name The name of this agent.
+//! @param [in] circles: A list of circle.
+api.Player = function(name, circles) {
+  this.name = name;
+  this.circles = circles;
+};
+
+
+//! Lets the api module knows the name of the our circles.
+//! @param [in] name The name.
+api.setSelfName = function(name) {
+  api._name = name;
+};
+
+
 //! Sets the target position.
 //! @param [in] pos A dict, which (pos.x, pos.y) be the position.
 //! @param [in] useWindowCoord An optional argument, specifies whether this
 //!    function should treat pos as the window coordinate or not.
-api.setTargetPos = function(pos, useWindowCoord) {
+api.setTargetPosition = function(pos, useWindowCoord) {
   if (useWindowCoord === true) {
     api._canvasOldEventHandlers.onmousemove(
         {clientX : pos.x, clientY : pos.y});
@@ -33,6 +96,75 @@ api.attack = function() {
 };
 
 
+//! Gets the foods information.
+api.getFoods = function() {
+  var circles = api._getListOfCircles();
+  var ret = [];
+  for (var i = 0; i < circles.length; ++i) {
+    if (circles[i].isAgitated || circles[i].isVirus) {
+      continue;
+    }
+    ret.push(new api.Food(new api.Position(circles[i].x, circles[i].y),
+                          circles[i].size));
+  }
+  return ret;
+};
+
+
+//! Gets the foods information.
+api.getSpikes = function() {
+  var circles = api._getListOfCircles();
+  var ret = [];
+  for (var i = 0; i < circles.length; ++i) {
+    if (!circles[i].isVirus) {
+      continue;
+    }
+    ret.push(new api.Circle(new api.Position(circles[i].x, circles[i].y),
+                            circles[i].size));
+  }
+  return ret;
+};
+
+
+//! Gets the foods information.
+api.getSelf = function() {
+  var circles = api._getListOfCircles();
+  var selfCircles = [];
+  for (var i = 0; i < circles.length; ++i) {
+    if (circles[i].isAgitated || circles[i].isVirus ||
+        circles[i].name != api._name) {
+      continue;
+    }
+    selfCircles.push(new api.Circle(
+        new api.Position(circles[i].x, circles[i].y), circles[i].size));
+  }
+  return new api.Player(api._name, selfCircles);
+};
+
+
+//! Gets the foods information.
+api.getOpponents = function() {
+  var circles = api._getListOfCircles();
+  var players = {};
+  for (var i = 0; i < circles.length; ++i) {
+    if (circles[i].isAgitated || circles[i].isVirus ||
+        circles[i].name == api._name) {
+      continue;
+    }
+    if (!players.hasOwnProperty(circles[i].name)) {
+      players[circles[i].name] = [];
+    }
+    players[circles[i].name].push(new api.Circle(
+        new api.Position(circles[i].x, circles[i].y), circles[i].size));
+  }
+  var ret = [];
+  for (var name in players) {
+    ret.push(new api.Player(name, players[name]));
+  }
+  return ret;
+};
+
+
 //! Initializes all things.
 //! Including function/variable declarations.
 api.init = function() {
@@ -42,6 +174,9 @@ api.init = function() {
   //! contains all the original canvas' event handlers, inititialized in
   //! _replaceCanvasEventHandlers().
   api._canvasEventHandlers = {};
+
+  //! name of our circles, setup by `setName()` function.
+  api._name = null;
 
   api.originalInit();
 
