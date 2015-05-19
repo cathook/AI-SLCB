@@ -69,11 +69,14 @@ A Google Chrome extension for invincible AI on agar.io, a popular web-based game
 ## APIs for creating AI agent
 
 ```javascript
-function getSelf(); // Returns a list of fissions with absolute position and size.
-function getOpponents(); // Returns a list of positions and sizes of the opponents' fissions list within eyesight.
-function getFoods(); // Returns the list of food objects.
-function getSpikes(); // Returns the list of spike objects.
-function nextPosition(); // Sends the next position to the server.
+function getSelf();  // Returns a list of fissions with absolute position and size.
+function getOpponents();  // Returns a list of positions and sizes of the opponents' fissions list within eyesight.
+function getFoods();  // Returns the list of food objects.
+function getSpikes();  // Returns the list of spike objects.
+function setTargetPosition();  // Sends the next position to the server.
+function setName();  // Sets the name of our agent.
+function attack();  // Attacks by throwing a little body.
+function split();  // Splits the body.
 ```
 
 ## Potential strategies for our agent
