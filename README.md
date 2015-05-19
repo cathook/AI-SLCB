@@ -85,3 +85,7 @@ function nextPosition(); // Sends the next position to the server.
 |HENEDEDANXIAOGUAY|a mixture of DANXIAOGUAY and ESIGUAY.|
 |GONGJIGUAY|tries to eliminate enemies within a certain range.|
 |ZHIZHANGGUAY|makes random moves.|
+
+## Coding style
+* [Google JavaScript coding style guide]: https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+

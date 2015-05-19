@@ -48,9 +48,6 @@ api.init = function() {
   api._replaceCanvasEventHandlers();
 
   window.onkeydown = api.keydownHandler;
-//  var p = document.getElementById('nick').parentNode.parentNode;
-//  p.onkeydown = function(e) { return false; }
-//  p.onkeyup = function(e) { return false; }
 };
 
 
@@ -103,6 +100,18 @@ api._replaceCanvasEventHandlers = function() {
     api._canvasEventHandlers[e] = api._canvas[e];
     api._canvas[e] = null;
   }
+};
+
+
+//! Backdoors for the variable `q`.
+api._getListOfCircles = function() {
+  console.log('no implementation here');
+};
+
+
+//! Backdoors for the variable `w`.
+api._getDictOfCircles = function() {
+  console.log('no implementation here');
 };
 
 
@@ -166,6 +175,8 @@ api.originalInit = function() {
     api._canvas = z;  //!< initialize.
   }
 
+  //! Creates a QUAD tree, put all data into it.
+  //! Called by `ba()`.
   function za() {
     if (.5 > h) H = null;
     else {
@@ -182,6 +193,7 @@ api.originalInit = function() {
     }
   }
 
+  //! Transform the window coordinate (O, P) to the absolute coordinate (Q, R)
   function aa() {
     Q = (O - p / 2) / h + s;
     R = (P - m / 2) / h + t
@@ -237,6 +249,9 @@ api.originalInit = function() {
     I && (r("#connecting").show(), oa())
   }
 
+  //! Connects to the websocket server.
+  //! Called by `oa()`
+  //! @param [in] a The server name.
   function pa(a) {
     if (l) {
       l.onopen = null;
@@ -266,6 +281,8 @@ api.originalInit = function() {
     }
   }
 
+  //! After the socket opened, do some initialize...
+  //! It is the onopen event handler for the websocket.
   function Aa(a) {
     r("#connecting").hide();
     console.log("socket open");
@@ -282,11 +299,14 @@ api.originalInit = function() {
     qa()
   }
 
+  //! Shows some message right after the websocket is closed.
+  //! It is the onclose event handler for the websocket.
   function Ca(a) {
     console.log("socket close");
     setTimeout(ca, 500)
   }
 
+  //! Message handler for the websocket.
   function Ba(a) {
     function b() {
       for (var a = "";;) {
@@ -342,11 +362,13 @@ api.originalInit = function() {
     }
   }
 
+  //! Sync the circles data.
   function Da(a) {
     E = +new Date;
     var b = Math.random(),
       c = 1;
     da = !1;
+    // deletes some circle.
     for (var d = a.getUint16(c, !0), c = c + 2, e = 0; e < d; ++e) {
       var k = w[a.getUint32(c, !0)],
         f = w[a.getUint32(c + 4, !0)],
@@ -354,6 +376,7 @@ api.originalInit = function() {
       k && f &&
         (f.destroy(), f.ox = f.x, f.oy = f.y, f.oSize = f.size, f.nx = k.x, f.ny = k.y, f.nSize = f.size, f.updateTime = E)
     }
+    // adds some circle.
     for (;;) {
       d = a.getUint32(c, !0);
       c += 4;
@@ -382,6 +405,7 @@ api.originalInit = function() {
       n.updateCode = b;
       n.updateTime = E; - 1 != B.indexOf(d) && -1 == g.indexOf(n) && (document.getElementById("overlays").style.display = "none", g.push(n), 1 == g.length && (s = n.x, t = n.y))
     }
+    // removes the old data.
     a.getUint16(c, !0);
     c += 2;
     k = a.getUint32(c, !0);
@@ -391,6 +415,7 @@ api.originalInit = function() {
     da && 0 == g.length && r("#overlays").fadeIn(3E3)
   }
 
+  //! Sends some information to the websocket server...
   function G() {
     if (ea()) {
       var a = O - p / 2,
@@ -399,6 +424,7 @@ api.originalInit = function() {
     }
   }
 
+  //! Sends the array `N` to the server.
   function qa() {
     if (ea() && null != N) {
       var a = new ArrayBuffer(1 + 2 * N.length),
@@ -409,10 +435,12 @@ api.originalInit = function() {
     }
   }
 
+  //! Checks whether the websocket is opened or not.
   function ea() {
     return null != l && l.readyState == l.OPEN
   }
 
+  //! Sents a 8-bit int to the server.
   function A(a) {
     if (ea()) {
       var b = new ArrayBuffer(1);
@@ -421,11 +449,13 @@ api.originalInit = function() {
     }
   }
 
+  //! Drawing and drawing...
   function la() {
     ba();
     f.requestAnimationFrame(la)
   }
 
+  //! Resize event handler.
   function ka() {
     p = f.innerWidth;
     m = f.innerHeight;
@@ -442,6 +472,7 @@ api.originalInit = function() {
     }
   }
 
+  //! Something likes re-draw and update...
   function ba() {
     var a = +new Date;
     ++Fa;
@@ -488,6 +519,7 @@ api.originalInit = function() {
     1 < v && (v = 1)
   }
 
+  //! Called by `ba()`
   function Ha() {
     if (ja && ga.width) {
       var a = p / 5;
@@ -495,11 +527,15 @@ api.originalInit = function() {
     }
   }
 
+  //! Called by `ba()`, calculate something, seems that it is an area size.
   function Ga() {
     for (var a = 0, b = 0; b < g.length; b++) a += g[b].nSize * g[b].nSize;
     return a
   }
 
+  //! Renders the leaderboard.
+  //! Called by `Ba()`, seems that it will be called while the leaderboard
+  //! changed.
   function ra() {
     x = null;
     if (null != u || 0 != y.length)
@@ -543,18 +579,30 @@ api.originalInit = function() {
     this.setName(f)
   }
 
+  //! A class for text block.
+  //! Use for "score", "name" of the agent...
   function Y(a, b, c, d) {
     a && (this._size = a);
     b && (this._color = b);
     this._stroke = !!c;
     d && (this._strokeColor = d)
   }
+
   if ("agar.io" != f.location.hostname && "localhost" != f.location.hostname && "10.10.2.13" != f.location.hostname) f.location = "http://agar.io/";
   else if (f.top != f) f.top.location = "http://agar.io/";
   else {
     // Known variables:
     // p: canvas width
     // m: canvas height
+    // O: window coordinate x
+    // P: window coordinate y
+    // Q: absolute coordinate x
+    // R: absoulte coordinate y
+    // H: the quad-tree
+    // $, z: canvas
+    // e: canvas.getContex('2d')
+    // w: a dict stores circles
+    // q: a list stores circles
     var $, e, z, p, m, H = null,
       l = null,
       s = 0,
@@ -593,6 +641,11 @@ api.originalInit = function() {
       Ia = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
       ja = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
       ga = new Image;
+
+    // Backdoors for access some variables.
+    api._getListOfCircles = function() { return q; };
+    api._getDictOfCircles = function() { return w; };
+
     ga.src = "img/split.png";
     var xa = document.createElement("canvas");
     if ("undefined" == typeof console || "undefined" == typeof DataView || "undefined" == typeof WebSocket || null == xa || null == xa.getContext) alert("You browser does not support this game, we recommend you to use Firefox to play this");
@@ -872,7 +925,7 @@ api.originalInit = function() {
         }
       };
 
-      ya();
+      ya();  //! Go!!
     }
   }
 };
