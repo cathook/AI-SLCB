@@ -15,20 +15,6 @@ api.Position = function(x, y) {
 };
 
 
-//! A food structure.
-//!
-//! struct variables:
-//!   position: An instance of `api.Position`, the position of this food.
-//!   size: Size of the food.
-//!
-//! @param [in] pos The position of the food.
-//! @param [in] size The size of the food.
-api.Food = function(pos, size) {
-  this.position = pos;
-  this.size = size;
-};
-
-
 //! A circle structure.
 //!
 //! struct variables:
@@ -104,8 +90,8 @@ api.getFoods = function() {
     if (circles[i].isAgitated || circles[i].isVirus) {
       continue;
     }
-    ret.push(new api.Food(new api.Position(circles[i].x, circles[i].y),
-                          circles[i].size));
+    ret.push(new api.Circle(
+        new api.Position(circles[i].x, circles[i].y),circles[i].size));
   }
   return ret;
 };
