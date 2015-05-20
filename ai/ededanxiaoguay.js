@@ -1,6 +1,6 @@
 var ai = ai || {};  //!< namespace ai
 
-ai.ededanxiaoguay = ai.ededanxiaoguay || {};  //! <namespace ai.ededanxiaoguay
+ai.ededanxiaoguay = ai.ededanxiaoguay || {};  //!< namespace ai.ededanxiaoguay
 
 
 //! Starts to use this agent.
@@ -21,31 +21,43 @@ ai.ededanxiaoguay.stop = function() {
 };
 
 
-ai.ededanxiaoguay.getEscapeTargetPosition = function(agent, oppns) {
+ai.ededanxiaoguay.getEscapeTargetPosition = function(agent, oppns, spikes) {
   var vsum = new util.Vector2D(0, 0), wsum = 0;
+  var update = function(v, w) {
+    vsum.addToThis(v.times(w));
+    wsum += w;
+    needToEscape = true;
+  }
   var needToEscape = false;
   for (var i = 0; i < oppns.length; ++i) {
     for (var j = 0; j < oppns[i].circles.length; ++j) {
       var d = 0, bad = api.estimateDangerRadius(oppns[i].circles[j].radius);
       d += oppns[i].circles[j].center.minus(agent.circles[0].center).length();
-      d -= oppns[i].circles[j].radius;
-      d += agent.circles[0].radius;
+      d -= oppns[i].circles[j].radius * 1.2;
+      d += agent.circles[0].radius / 2;
       if (d < bad) {
         var delta = agent.circles[0].center.minus(oppns[i].circles[j].center);
-        var w = 2 * (bad - d);
-        vsum.addToThis(delta.times(w / delta.length()));
-        wsum += w / bad;
-        needToEscape = true;
+        update(delta.normalize(), 2 * (bad - d) / bad);
       }
     }
   }
-  return (needToEscape ? agent.circles[0].center.add(vsum.div(wsum)) : false);
+  var myRadius = agent.circles[0].radius;
+  for (var i = 0; i < spikes.length; ++i) {
+    var delta = agent.circles[0].center.minus(spikes[i].center);
+    if (spikes[i].radius < myRadius && delta.length() < myRadius * 1.75) {
+      update(delta.normalize(),
+             3 * (myRadius * 1.75 - delta.length() / (myRadius * 1.75)));
+    }
+  }
+  var len = api.estimateDangerRadius(agent.circles[0].radius);
+  return (needToEscape ? agent.circles[0].center.add(vsum.times(len).div(wsum))
+                       : false);
 };
 
 
 //! run...
 ai.ededanxiaoguay._run = function() {
-  var goNext = function() { window.setTimeout(ai.ededanxiaoguay._run, 500); };
+  var goNext = function() { window.setTimeout(ai.ededanxiaoguay._run, 100); };
   if (ai.ededanxiaoguay._runFlag !== true) {
     return;
   }
@@ -56,9 +68,10 @@ ai.ededanxiaoguay._run = function() {
     return;
   }
 
-  var t = ai.ededanxiaoguay.getEscapeTargetPosition(agent, api.getOpponents());
+  var t = ai.ededanxiaoguay.getEscapeTargetPosition(
+      agent, api.getOpponents(), api.getSpikes());
   if (t === false) {
-    t = ai.esiguay.getTargetPosition(agent, api.getFoods());
+    t = ai.esiguay2.getTargetPosition(agent, api.getFoods());
     ai.ededanxiaoguay._targetPoint.type = api.MarkPointType.TARGET;
   } else {
     ai.ededanxiaoguay._targetPoint.type = api.MarkPointType.X;

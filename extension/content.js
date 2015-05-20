@@ -12,7 +12,7 @@ extension.initFunc = function() {
   api.registerKeyboardHandler(
       'sS', function() { api.setIsUserOwnSplit(!api.isUserOwnSplit()); });
 
-  api.setSelfName('default name');
+  api.setSelfName('AI');
   api.setRegion('JP-Tokyo');
 
   ai.ededanxiaoguay.start();

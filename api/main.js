@@ -17,12 +17,15 @@ api.Position = util.Vector2D;
 //! struct variables:
 //!   center: An instance of `api.Position`, the center of this circle.
 //!   radius: Radius of the circle.
+//!   direction: The direction this circle move.
 //!
 //! @param [in] center The center of the circle.
 //! @param [in] radius The radius of the circle.
-api.Circle = function(center, radius) {
+//! @param [in] direction The direction.
+api.CircleBody = function(center, radius, direction) {
   this.center = center;
   this.radius = radius;
+  this.direction = direction;
 };
 
 
@@ -171,7 +174,10 @@ api.getFoods = function() {
     if (!cs[i].destroyed &&
         !cs[i].isVirus &&
         !api._isOurCircle(cs[i]) && cs[i].size < r) {
-      ret.push(new api.Circle(new api.Position(cs[i].x, cs[i].y),cs[i].size));
+      ret.push(new api.CircleBody(new api.Position(cs[i].x, cs[i].y),
+                                  cs[i].size,
+                                  new util.Vector2D(cs[i].nx - cs[i].ox,
+                                                    cs[i].ny - cs[i].oy)));
     }
   }
   return ret;
@@ -183,7 +189,10 @@ api.getSpikes = function() {
   var ret = [];
   for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
     if (cs[i].isVirus && !cs[i].destroyed) {
-      ret.push(new api.Circle(new api.Position(cs[i].x, cs[i].y), cs[i].size));
+      ret.push(new api.CircleBody(new api.Position(cs[i].x, cs[i].y),
+                                  cs[i].size,
+                                  new util.Vector2D(cs[i].nx - cs[i].ox,
+                                                    cs[i].ny - cs[i].oy)));
     }
   }
   return ret;
@@ -194,8 +203,9 @@ api.getSpikes = function() {
 api.getSelf = function() {
   var selfCircles = [];
   for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
-    selfCircles.push(new api.Circle(
-        new api.Position(cs[i].x, cs[i].y), cs[i].size));
+    selfCircles.push(new api.CircleBody(
+        new api.Position(cs[i].x, cs[i].y), cs[i].size,
+        new util.Vector2D(cs[i].nx - cs[i].ox, cs[i].ny - cs[i].oy)));
   }
   return new api.Player(api._name, selfCircles);
 };
@@ -214,8 +224,10 @@ api.getOpponents = function() {
       if (!players.hasOwnProperty(cs[i].name)) {
         players[cs[i].name] = [];
       }
-      players[cs[i].name].push(new api.Circle(
-          new api.Position(cs[i].x, cs[i].y), cs[i].size));
+      players[cs[i].name].push(new api.CircleBody(
+          new api.Position(cs[i].x, cs[i].y),
+          cs[i].size,
+          new util.Vector2D(cs[i].nx - cs[i].ox, cs[i].ny - cs[i].oy)));
     }
   }
   var ret = [];
@@ -224,6 +236,9 @@ api.getOpponents = function() {
   }
   return ret;
 };
+
+
+api.getMapRect = function() { return new api.Position(11180, 11180); };
 
 
 api.estimateDangerRadius = function(radius) {
