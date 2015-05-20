@@ -203,9 +203,14 @@ api.getSelf = function() {
 
 //! Gets the foods information.
 api.getOpponents = function() {
+  var r = Number.POSITIVE_INFINITY;
+  for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
+    r = Math.min(r, cs[i].size);
+  }
   var players = {};
   for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
-    if (!cs[i].destroyed && !cs[i].isVirus && !api._isOurCircle(cs[i])) {
+    if (!cs[i].destroyed && !cs[i].isVirus && !api._isOurCircle(cs[i]) &&
+        cs[i].size > r) {
       if (!players.hasOwnProperty(cs[i].name)) {
         players[cs[i].name] = [];
       }
@@ -222,7 +227,7 @@ api.getOpponents = function() {
 
 
 api.estimateDangerRadius = function(radius) {
-  return radius * 2;
+  return 800;
 };
 
 
@@ -845,9 +850,13 @@ api.originalInit = function() {
 
   var updateCircleMarks = (function() {
     var circles = {};
+    var me = {};
     return function() {
       for (var id in circles) {
         circles[id].updated = false;
+      }
+      for (var id in me) {
+        me[id].updated = false;
       }
       for (var i = 0; i < q.length; ++i) {
         if (!circles.hasOwnProperty(q[i].id)) {
@@ -859,7 +868,22 @@ api.originalInit = function() {
                                   new api.Position(), 0, '#000000',
                                   api.CircleRangeType.DOTTED)};
           api.addMark(circles[q[i].id].arrow);
-          api.addMark(circles[q[i].id].range);
+//          api.addMark(circles[q[i].id].range);
+        }
+        if (g.indexOf(q[i]) >= 0) {
+          if (!me.hasOwnProperty(q[i].id)) {
+            me[q[i].id] = {updated : true, ranges : []};
+            for (var r = 800; r <= 800; r += 100) {
+              var c = new api.CircleRange(new api.Position(), r, '#000000',
+                                          api.CircleRangeType.DOTTED);
+              me[q[i].id].ranges.push(c);
+              api.addMark(c);
+            }
+          }
+          for (var j = 0; j < me[q[i].id].ranges.length; ++j) {
+            me[q[i].id].ranges[j].center.x = q[i].x;
+            me[q[i].id].ranges[j].center.y = q[i].y;
+          }
         }
         circles[q[i].id].updated = true;
         circles[q[i].id].arrow.from.x = q[i].ox;
@@ -873,8 +897,16 @@ api.originalInit = function() {
       for (var id in circles) {
         if (!circles[id].updated) {
           api.removeMark(circles[id].arrow);
-          api.removeMark(circles[id].range);
+//          api.removeMark(circles[id].range);
           delete circles[id];
+        }
+      }
+      for (var id in me) {
+        if (!me[id].updated) {
+          for (var i = 0; i < me[id].ranges.length; ++i) {
+            api.removeMark(me[id].ranges[i]);
+          }
+          delete me[id];
         }
       }
     };

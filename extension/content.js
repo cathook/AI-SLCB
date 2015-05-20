@@ -4,7 +4,6 @@ var extension = extension || {};  //!< namespace extension
 //! @brief Event handler for window's onload event.
 extension.initFunc = function() {
   api.init();
-  ai.esiguay.start();
 
   api.registerKeyboardHandler(
       'mM', function() { api.setIsUserOwnMove(!api.isUserOwnMove()); });
@@ -15,6 +14,8 @@ extension.initFunc = function() {
 
   api.setSelfName('default name');
   api.setRegion('JP-Tokyo');
+
+  ai.ededanxiaoguay.start();
 };
 
 
@@ -33,6 +34,11 @@ extension.main = function() {
 //! @brief Inserts a peace of javascript code tag.
 //! @param [in] code The code.
 extension._insertJS = function(code) {
+  if (typeof document == 'undefined') {
+    console.log(code);
+    return;
+  }
+
   var script = document.createElement('script');
   script.setAttribute('type', 'text/javascript');
   script.innerHTML = code;

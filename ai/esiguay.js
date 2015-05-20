@@ -21,6 +21,25 @@ ai.esiguay.stop = function() {
 }
 
 
+ai.esiguay.getTargetPosition = function(agent, foods) {
+  var ret;
+  if (foods.length == 0) {
+    ret = agent.circles[0].clone();
+  } else {
+    var nearest = 0, mindist = Number.POSITIVE_INFINITY;
+    for (var i = 0; i < foods.length; ++i) {
+      var dist = foods[i].center.minus(agent.circles[0].center).length2();
+      if (dist < mindist) {
+        mindist = dist;
+        nearest = i;
+      }
+    }
+    ret = foods[nearest].center.clone();
+  };
+  return ret;
+};
+
+
 //! run...
 ai.esiguay._run = function() {
   var goNext = function() { window.setTimeout(ai.esiguay._run, 500); };
@@ -28,30 +47,18 @@ ai.esiguay._run = function() {
     return;
   }
 
-  var self = api.getSelf();
-  if (self.circles.length == 0) {
+  var agent = api.getSelf();
+  if (agent.circles.length == 0) {
     goNext();
     return;
   }
 
-  var foods = api.getFoods();
-  if (foods.length == 0) {
-    api.setTargetPosition(new api.Position(0, 0));
-    console.log('warning!! no food');
-  } else {
-    var nearest = 0, mindist = Number.POSITIVE_INFINITY;
-    for (var i = 0; i < foods.length; ++i) {
-      var dist = foods[i].center.minus(self.circles[0].center).length2();
-      if (dist < mindist) {
-        mindist = dist;
-        nearest = i;
-      }
-    }
-    api.setTargetPosition(foods[nearest].center);
-    ai.esiguay._targetPoint.position.copyFrom(foods[nearest].center);
-  }
+  var dst = ai.esiguay.getTargetPosition(agent, api.getFoods());
+  api.setTargetPosition(dst);
+  ai.esiguay._targetPoint.position.copyFrom(dst);
 
   goNext();
 };
+
 
 ai.esiguay._targetPoint = null;
