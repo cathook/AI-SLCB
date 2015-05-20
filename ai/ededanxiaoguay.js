@@ -33,7 +33,7 @@ ai.ededanxiaoguay.getEscapeTargetPosition = function(agent, oppns, spikes) {
     for (var j = 0; j < oppns[i].circles.length; ++j) {
       var d = 0, bad = api.estimateDangerRadius(oppns[i].circles[j].radius);
       d += oppns[i].circles[j].center.minus(agent.circles[0].center).length();
-      d -= oppns[i].circles[j].radius * 1.2;
+      d -= oppns[i].circles[j].radius * 1.1;
       d += agent.circles[0].radius / 2;
       if (d < bad) {
         var delta = agent.circles[0].center.minus(oppns[i].circles[j].center);

@@ -24,13 +24,13 @@ ai.esiguay2.stop = function() {
 ai.esiguay2.getTargetPosition = function(agent, foods) {
   var ret;
   if (foods.length == 0) {
-    ret = agent.circles[0].clone();
+    ret = agent.circles[0].center.clone();
   } else {
     var nearest = 0, minval = Number.POSITIVE_INFINITY;
     for (var i = 0; i < foods.length; ++i) {
       var r2 = api.getMapRect().minus(foods[i].center);
       var val = 0;
-      val += foods[i].center.minus(agent.circles[0].center).length2();
+      val += foods[i].center.minus(agent.circles[0].center).length2() * 100;
       val += Math.pow(Math.max(foods[i].center.x, r2.x), 3);
       val += Math.pow(Math.max(foods[i].center.y, r2.y), 3);
       if (val < minval) {
