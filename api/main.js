@@ -92,6 +92,12 @@ api.setSelfName = function(name) {
 };
 
 
+api.setRegion = function(region) {
+  document.getElementById('region').value = region;
+  document.getElementById('region').onchange();
+};
+
+
 //! Sets the target position.
 //! @param [in] pos A dict, which (pos.x, pos.y) be the position.
 //! @param [in] useWindowCoord An optional argument, specifies whether this
@@ -144,7 +150,9 @@ api.getFoods = function() {
   }
   var ret = [];
   for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
-    if (!cs[i].isVirus && !api._isOurCircle(cs[i]) && cs[i].size < r) {
+    if (!cs[i].destroyed &&
+        !cs[i].isVirus &&
+        !api._isOurCircle(cs[i]) && cs[i].size < r) {
       ret.push(new api.Circle(new api.Position(cs[i].x, cs[i].y),cs[i].size));
     }
   }
@@ -156,7 +164,7 @@ api.getFoods = function() {
 api.getSpikes = function() {
   var ret = [];
   for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
-    if (cs[i].isVirus) {
+    if (cs[i].isVirus && !cs[i].destroyed) {
       ret.push(new api.Circle(new api.Position(cs[i].x, cs[i].y), cs[i].size));
     }
   }
@@ -179,7 +187,7 @@ api.getSelf = function() {
 api.getOpponents = function() {
   var players = {};
   for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
-    if (!cs[i].isVirus && !api._isOurCircle(cs[i])) {
+    if (!cs[i].destroyed && !cs[i].isVirus && !api._isOurCircle(cs[i])) {
       if (!players.hasOwnProperty(cs[i].name)) {
         players[cs[i].name] = [];
       }
@@ -855,7 +863,7 @@ api.originalInit = function() {
     }
     e.restore();
   }
-  
+
   function drawArrow(arr) {
     var v0 = arr.from.minus(arr.to);
     var v1 = v0.rotate(Math.PI / 6).div(3);
@@ -866,7 +874,7 @@ api.originalInit = function() {
     drawLine(arr.to, arr.to.add(v1));
     drawLine(arr.to, arr.to.add(v2));
   }
-  
+
   function drawPoint(p) {
     if (p.type == api.PointType.TARGET) {
       e.strokeStyle = p.color;

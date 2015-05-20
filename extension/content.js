@@ -14,6 +14,7 @@ extension.initFunc = function() {
       'sS', function() { api.setIsUserOwnSplit(!api.isUserOwnSplit()); });
 
   api.setSelfName('default name');
+  api.setRegion('JP-Tokyo');
 };
 
 
