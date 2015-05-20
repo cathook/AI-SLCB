@@ -43,7 +43,6 @@ ai.esiguay._run = function() {
       }
     }
     api.setTargetPosition(foods[nearest].center);
-    console.log('target: ' + foods[nearest].center.toString());
   }
 
   goNext();

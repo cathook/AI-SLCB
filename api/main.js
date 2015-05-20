@@ -45,9 +45,25 @@ api.Player = function(name, circles) {
 //! struct variables:
 //!   from: an position.
 //!   to: an position.
-api.Arrow = function(from, to) {
+//!   color: color to draw.
+api.Arrow = function(from, to, color) {
   this.from = from;
   this.to = to;
+  this.color = color;
+};
+
+
+//! Initializes all things.
+//! Including function/variable declarations.
+api.init = function() {
+  api.originalInit();
+
+  api._replaceEventHandlers();
+
+  window.onkeydown = api._keydownHandler;
+  window.onkeyup = api._keyupHandler;
+
+  api._initialized = true;
 };
 
 
@@ -164,7 +180,9 @@ api.getOpponents = function() {
 
 api.isInitialized = function() { return api._initialized; };
 
+
 api.isUserOwnMove = function() { return api._userOwnMove; }
+
 
 api.setIsUserOwnMove = function(flag) {
   api._userOwnMove = flag;
@@ -175,7 +193,9 @@ api.setIsUserOwnMove = function(flag) {
   }
 };
 
+
 api.isUserOwnAttack = function() { return api._userOwnAttack; };
+
 
 api.setIsUserOwnAttack = function(flag) {
   api._userOwnAttack = flag;
@@ -188,7 +208,9 @@ api.setIsUserOwnAttack = function(flag) {
   }
 };
 
+
 api.isUserOwnSplit = function() { return api._userOwnSplit; };
+
 
 api.setIsUserOwnSplit = function(flag) {
   api._userOwnSplit = flag;
@@ -215,17 +237,19 @@ api.registerKeyboardHandler = function(chr, handler) {
 };
 
 
-//! Initializes all things.
-//! Including function/variable declarations.
-api.init = function() {
-  api.originalInit();
+api.addArrow = function(arrow) {
+  if (api._arrows.indexOf(arrow) <= 0) {
+    api._arrows.push(arrow);
+  }
+};
 
-  api._replaceEventHandlers();
 
-  window.onkeydown = api._keydownHandler;
-  window.onkeyup = api._keyupHandler;
-
-  api._initialized = true;
+api.removeArrow = function(arrow) {
+  var index = api._arrows.indexOf(arrow);
+  if (index >= 0) {
+    api._arrows[index] = api._arrows[api._arrows.length - 1];
+    api._arrows.pop();
+  }
 };
 
 
@@ -350,6 +374,9 @@ api._allowedKeyCodes = {};
 
 //! name of our circles, setup by `setSelfName()` function.
 api._name = null;
+
+
+api._arrows = [];
 
 
 //! The original initial function of agar.io.
@@ -756,6 +783,8 @@ api.originalInit = function() {
     e.translate(-s, -t);
     for (d = 0; d < C.length; d++) C[d].draw();
     for (d = 0; d < q.length; d++) q[d].draw();
+    updateCircleArrows();
+    drawArrows();
     e.restore();
     x && e.drawImage(x, p - x.width - 10, 10);
     D = Math.max(D, Ga());
@@ -764,6 +793,62 @@ api.originalInit = function() {
     a = +new Date - a;
     a > 1E3 / 60 ? v -= .01 : a < 1E3 / 65 && (v += .01);.4 > v && (v = .4);
     1 < v && (v = 1)
+  }
+
+  var updateCircleArrows = (function() {
+    var arrows = {};
+    return function() {
+      for (var id in arrows) {
+        arrows[id].updated = false;
+      }
+      for (var i = 0; i < q.length; ++i) {
+        if (!arrows.hasOwnProperty(q[i].id)) {
+          arrows[q[i].id] = {updated : true,
+                             arrow : new api.Arrow(new api.Position(),
+                                                   new api.Position(),
+                                                   '#000000')};
+          api.addArrow(arrows[q[i].id].arrow);
+        }
+        arrows[q[i].id].updated = true;
+        arrows[q[i].id].arrow.from.x = q[i].ox;
+        arrows[q[i].id].arrow.from.y = q[i].oy;
+        arrows[q[i].id].arrow.to.x = q[i].nx;
+        arrows[q[i].id].arrow.to.y = q[i].ny;
+      }
+      for (var id in arrows) {
+        if (!arrows[id].updated) {
+          api.removeArrow(arrows[id].arrow);
+          delete arrows[id];
+        }
+      }
+    };
+  })();
+
+
+  //! Drawing the arrows.
+  function drawArrows() {
+    e.save();
+    e.lineWidth = 10;
+    e.lineCap = 'round';
+    for (var i = 0; i < api._arrows.length; ++i) {
+      var arr = api._arrows[i];
+      var v0 = arr.from.minus(arr.to);
+      var v1 = v0.rotate(Math.PI / 6).div(3);
+      var v2 = v0.rotate(-Math.PI / 6).div(3);
+      e.strokeStyle = arr.color;
+      drawLine(arr.from, arr.to);
+      drawLine(arr.to, arr.to.add(v1));
+      drawLine(arr.to, arr.to.add(v2));
+    }
+    e.restore();
+  }
+
+  //! Draws a line.
+  function drawLine(a, b) {
+    e.beginPath();
+    e.moveTo(a.x, a.y);
+    e.lineTo(b.x, b.y);
+    e.stroke();
   }
 
   //! Called by `ba()`
