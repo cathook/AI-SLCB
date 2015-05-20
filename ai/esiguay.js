@@ -5,9 +5,9 @@ ai.esiguay = ai.esiguay || {};  //!< namespace ai.esiguay
 
 //! Starts to use this agent.
 ai.esiguay.start = function() {
-  ai.esiguay._targetPoint = new api.Point(new api.Position(),
-                                          '#006600',
-                                          api.PointType.TARGET);
+  ai.esiguay._targetPoint = new api.MarkPoint(new api.Position(),
+                                              '#006600',
+                                              api.MarkPointType.TARGET);
   ai.esiguay._runFlag = true;
   api.addMark(ai.esiguay._targetPoint);
   ai.esiguay._run();

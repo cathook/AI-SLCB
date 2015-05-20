@@ -53,13 +53,13 @@ api.Arrow = function(from, to, color) {
 };
 
 
-//! A type point.
+//! A point.
 //!
 //! struct variables:
 //!   position: an position.
 //!   color: color to draw.
 //!   type: a type.
-api.Point = function(pos, color, type) {
+api.MarkPoint = function(pos, color, type) {
   this.position = pos;
   this.color = color;
   this.type = type;
@@ -67,7 +67,25 @@ api.Point = function(pos, color, type) {
 
 
 //! Types of point.
-api.PointType = new util.Enum('TARGET');
+api.MarkPointType = new util.Enum('TARGET', 'X');
+
+
+//! A circle range.
+//!
+//! struct variables:
+//!   center: an position.
+//!   radius: the radius.
+//!   color: color to draw.
+//!   type: a type.
+api.CircleRange = function(center, radius, color, type) {
+  this.center = center;
+  this.radius = radius;
+  this.color = color;
+  this.type = type;
+};
+
+
+api.CircleRangeType = new util.Enum('DOTTED');
 
 
 //! Initializes all things.
@@ -200,6 +218,11 @@ api.getOpponents = function() {
     ret.push(new api.Player(name, players[name]));
   }
   return ret;
+};
+
+
+api.estimateDangerRadius = function(radius) {
+  return radius * 2;
 };
 
 
@@ -821,29 +844,37 @@ api.originalInit = function() {
   }
 
   var updateCircleMarks = (function() {
-    var arrows = {};
+    var circles = {};
     return function() {
-      for (var id in arrows) {
-        arrows[id].updated = false;
+      for (var id in circles) {
+        circles[id].updated = false;
       }
       for (var i = 0; i < q.length; ++i) {
-        if (!arrows.hasOwnProperty(q[i].id)) {
-          arrows[q[i].id] = {updated : true,
-                             arrow : new api.Arrow(new api.Position(),
-                                                   new api.Position(),
-                                                   '#000000')};
-          api.addMark(arrows[q[i].id].arrow);
+        if (!circles.hasOwnProperty(q[i].id)) {
+          circles[q[i].id] = {updated : true,
+                              arrow : new api.Arrow(new api.Position(),
+                                                    new api.Position(),
+                                                    '#000000'),
+                              range : new api.CircleRange(
+                                  new api.Position(), 0, '#000000',
+                                  api.CircleRangeType.DOTTED)};
+          api.addMark(circles[q[i].id].arrow);
+          api.addMark(circles[q[i].id].range);
         }
-        arrows[q[i].id].updated = true;
-        arrows[q[i].id].arrow.from.x = q[i].ox;
-        arrows[q[i].id].arrow.from.y = q[i].oy;
-        arrows[q[i].id].arrow.to.x = q[i].nx;
-        arrows[q[i].id].arrow.to.y = q[i].ny;
+        circles[q[i].id].updated = true;
+        circles[q[i].id].arrow.from.x = q[i].ox;
+        circles[q[i].id].arrow.from.y = q[i].oy;
+        circles[q[i].id].arrow.to.x = q[i].nx;
+        circles[q[i].id].arrow.to.y = q[i].ny;
+        circles[q[i].id].range.center.x = q[i].x;
+        circles[q[i].id].range.center.y = q[i].y;
+        circles[q[i].id].range.radius = api.estimateDangerRadius(q[i].size);
       }
-      for (var id in arrows) {
-        if (!arrows[id].updated) {
-          api.removeMark(arrows[id].arrow);
-          delete arrows[id];
+      for (var id in circles) {
+        if (!circles[id].updated) {
+          api.removeMark(circles[id].arrow);
+          api.removeMark(circles[id].range);
+          delete circles[id];
         }
       }
     };
@@ -857,8 +888,10 @@ api.originalInit = function() {
     for (var i = 0; i < api._marks.length; ++i) {
       if (api._marks[i] instanceof api.Arrow) {
         drawArrow(api._marks[i]);
-      } else if (api._marks[i] instanceof api.Point) {
-        drawPoint(api._marks[i]);
+      } else if (api._marks[i] instanceof api.MarkPoint) {
+        drawMarkPoint(api._marks[i]);
+      } else if (api._marks[i] instanceof api.CircleRange) {
+        drawCircleRange(api._marks[i]);
       }
     }
     e.restore();
@@ -875,8 +908,8 @@ api.originalInit = function() {
     drawLine(arr.to, arr.to.add(v2));
   }
 
-  function drawPoint(p) {
-    if (p.type == api.PointType.TARGET) {
+  function drawMarkPoint(p) {
+    if (p.type == api.MarkPointType.TARGET) {
       e.strokeStyle = p.color;
       e.lineWidth = 5;
       var r = 40;
@@ -885,6 +918,25 @@ api.originalInit = function() {
       drawLine(p.position.minus(new util.Vector2D(0, r)),
                p.position.add(new util.Vector2D(0, r)));
       drawCircle(p.position, r / 2);
+    } else if (p.type == api.MarkPointType.X) {
+      e.strokeStyle = p.color;
+      e.lineWidth = 5;
+      var r = 40;
+      drawLine(p.position.minus(new util.Vector2D(r, r)),
+               p.position.add(new util.Vector2D(r, r)));
+      drawLine(p.position.minus(new util.Vector2D(-r, r)),
+               p.position.add(new util.Vector2D(-r, r)));
+    }
+  }
+
+  function drawCircleRange(cr) {
+    if (cr.type == api.CircleRangeType.DOTTED) {
+      e.save();
+      e.strokeStyle = cr.color;
+      e.lineWidth = 5;
+      e.setLineDash([5, 15]);
+      drawCircle(cr.center, cr.radius);
+      e.restore();
     }
   }
 
