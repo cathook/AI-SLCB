@@ -40,7 +40,7 @@ api.Player = function(name, circles) {
 };
 
 
-//! A arrow.
+//! An arrow.
 //!
 //! struct variables:
 //!   from: an position.
@@ -51,6 +51,23 @@ api.Arrow = function(from, to, color) {
   this.to = to;
   this.color = color;
 };
+
+
+//! A type point.
+//!
+//! struct variables:
+//!   position: an position.
+//!   color: color to draw.
+//!   type: a type.
+api.Point = function(pos, color, type) {
+  this.position = pos;
+  this.color = color;
+  this.type = type;
+};
+
+
+//! Types of point.
+api.PointType = new util.Enum('TARGET');
 
 
 //! Initializes all things.
@@ -237,18 +254,18 @@ api.registerKeyboardHandler = function(chr, handler) {
 };
 
 
-api.addArrow = function(arrow) {
-  if (api._arrows.indexOf(arrow) <= 0) {
-    api._arrows.push(arrow);
+api.addMark = function(m) {
+  if (api._marks.indexOf(m) <= 0) {
+    api._marks.push(m);
   }
 };
 
 
-api.removeArrow = function(arrow) {
-  var index = api._arrows.indexOf(arrow);
+api.removeMark = function(m) {
+  var index = api._marks.indexOf(m);
   if (index >= 0) {
-    api._arrows[index] = api._arrows[api._arrows.length - 1];
-    api._arrows.pop();
+    api._marks[index] = api._marks[api._marks.length - 1];
+    api._marks.pop();
   }
 };
 
@@ -376,7 +393,7 @@ api._allowedKeyCodes = {};
 api._name = null;
 
 
-api._arrows = [];
+api._marks = [];
 
 
 //! The original initial function of agar.io.
@@ -783,8 +800,8 @@ api.originalInit = function() {
     e.translate(-s, -t);
     for (d = 0; d < C.length; d++) C[d].draw();
     for (d = 0; d < q.length; d++) q[d].draw();
-    updateCircleArrows();
-    drawArrows();
+    updateCircleMarks();
+    drawMarks();
     e.restore();
     x && e.drawImage(x, p - x.width - 10, 10);
     D = Math.max(D, Ga());
@@ -795,7 +812,7 @@ api.originalInit = function() {
     1 < v && (v = 1)
   }
 
-  var updateCircleArrows = (function() {
+  var updateCircleMarks = (function() {
     var arrows = {};
     return function() {
       for (var id in arrows) {
@@ -807,7 +824,7 @@ api.originalInit = function() {
                              arrow : new api.Arrow(new api.Position(),
                                                    new api.Position(),
                                                    '#000000')};
-          api.addArrow(arrows[q[i].id].arrow);
+          api.addMark(arrows[q[i].id].arrow);
         }
         arrows[q[i].id].updated = true;
         arrows[q[i].id].arrow.from.x = q[i].ox;
@@ -817,7 +834,7 @@ api.originalInit = function() {
       }
       for (var id in arrows) {
         if (!arrows[id].updated) {
-          api.removeArrow(arrows[id].arrow);
+          api.removeMark(arrows[id].arrow);
           delete arrows[id];
         }
       }
@@ -825,22 +842,42 @@ api.originalInit = function() {
   })();
 
 
-  //! Drawing the arrows.
-  function drawArrows() {
+  //! Drawing the marks.
+  function drawMarks() {
     e.save();
-    e.lineWidth = 10;
     e.lineCap = 'round';
-    for (var i = 0; i < api._arrows.length; ++i) {
-      var arr = api._arrows[i];
-      var v0 = arr.from.minus(arr.to);
-      var v1 = v0.rotate(Math.PI / 6).div(3);
-      var v2 = v0.rotate(-Math.PI / 6).div(3);
-      e.strokeStyle = arr.color;
-      drawLine(arr.from, arr.to);
-      drawLine(arr.to, arr.to.add(v1));
-      drawLine(arr.to, arr.to.add(v2));
+    for (var i = 0; i < api._marks.length; ++i) {
+      if (api._marks[i] instanceof api.Arrow) {
+        drawArrow(api._marks[i]);
+      } else if (api._marks[i] instanceof api.Point) {
+        drawPoint(api._marks[i]);
+      }
     }
     e.restore();
+  }
+  
+  function drawArrow(arr) {
+    var v0 = arr.from.minus(arr.to);
+    var v1 = v0.rotate(Math.PI / 6).div(3);
+    var v2 = v0.rotate(-Math.PI / 6).div(3);
+    e.strokeStyle = arr.color;
+    e.lineWidth = 10;
+    drawLine(arr.from, arr.to);
+    drawLine(arr.to, arr.to.add(v1));
+    drawLine(arr.to, arr.to.add(v2));
+  }
+  
+  function drawPoint(p) {
+    if (p.type == api.PointType.TARGET) {
+      e.strokeStyle = p.color;
+      e.lineWidth = 5;
+      var r = 40;
+      drawLine(p.position.minus(new util.Vector2D(r, 0)),
+               p.position.add(new util.Vector2D(r, 0)));
+      drawLine(p.position.minus(new util.Vector2D(0, r)),
+               p.position.add(new util.Vector2D(0, r)));
+      drawCircle(p.position, r / 2);
+    }
   }
 
   //! Draws a line.
@@ -848,6 +885,13 @@ api.originalInit = function() {
     e.beginPath();
     e.moveTo(a.x, a.y);
     e.lineTo(b.x, b.y);
+    e.stroke();
+  }
+
+  //! Draws a circle.
+  function drawCircle(c, r) {
+    e.beginPath();
+    e.arc(c.x, c.y, r, 0, Math.PI * 2);
     e.stroke();
   }
 

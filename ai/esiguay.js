@@ -5,7 +5,11 @@ ai.esiguay = ai.esiguay || {};  //!< namespace ai.esiguay
 
 //! Starts to use this agent.
 ai.esiguay.start = function() {
+  ai.esiguay._targetPoint = new api.Point(new api.Position(),
+                                          '#006600',
+                                          api.PointType.TARGET);
   ai.esiguay._runFlag = true;
+  api.addMark(ai.esiguay._targetPoint);
   ai.esiguay._run();
 };
 
@@ -13,6 +17,7 @@ ai.esiguay.start = function() {
 //! Stops this agent.
 ai.esiguay.stop = function() {
   ai.esiguay._runFlag = false;
+  api.removeMark(ai.esiguay._targetPoint);
 }
 
 
@@ -43,7 +48,10 @@ ai.esiguay._run = function() {
       }
     }
     api.setTargetPosition(foods[nearest].center);
+    ai.esiguay._targetPoint.position.copyFrom(foods[nearest].center);
   }
 
   goNext();
 };
+
+ai.esiguay._targetPoint = null;
