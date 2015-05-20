@@ -40,6 +40,17 @@ api.Player = function(name, circles) {
 };
 
 
+//! A arrow.
+//!
+//! struct variables:
+//!   from: an position.
+//!   to: an position.
+api.Arrow = function(from, to) {
+  this.from = from;
+  this.to = to;
+};
+
+
 //! Lets the api module knows the name of the our circles.
 //! @param [in] name The name.
 api.setSelfName = function(name) {
@@ -53,7 +64,7 @@ api.setSelfName = function(name) {
 //! @param [in] useWindowCoord An optional argument, specifies whether this
 //!    function should treat pos as the window coordinate or not.
 api.setTargetPosition = function(pos, useWindowCoord) {
-  if (!api.isInitialized() || api.isUserOwnMouse() == true) {
+  if (api.isUserOwnMove()) {
     return;
   }
   if (useWindowCoord === true) {
@@ -72,7 +83,7 @@ api.setTargetPosition = function(pos, useWindowCoord) {
 
 //! Splits the agent.
 api.split = function() {
-  if (!api.isInitialized()) {
+  if (api.isUserOwnSplit()) {
     return;
   }
   api._windowEventHandlers.onkeydown({keyCode : 32});
@@ -83,7 +94,7 @@ api.split = function() {
 
 //! Lets the agent attack by throwing an little body.
 api.attack = function() {
-  if (!api.isInitialized()) {
+  if (api.isUserOwnAttack()) {
     return;
   }
   api._windowEventHandlers.onkeydown({keyCode : 87});
@@ -94,9 +105,6 @@ api.attack = function() {
 
 //! Gets the foods information.
 api.getFoods = function() {
-  if (!api.isInitialized()) {
-    return [];
-  }
   var r = Number.POSITIVE_INFINITY;
   for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
     r = Math.min(r, cs[i].size);
@@ -113,9 +121,6 @@ api.getFoods = function() {
 
 //! Gets the foods information.
 api.getSpikes = function() {
-  if (!api.isInitialized()) {
-    return [];
-  }
   var ret = [];
   for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
     if (cs[i].isVirus) {
@@ -128,9 +133,6 @@ api.getSpikes = function() {
 
 //! Gets the foods information.
 api.getSelf = function() {
-  if (!api.isInitialized()) {
-    return new api.Player(api._name, []);
-  }
   var selfCircles = [];
   for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
     selfCircles.push(new api.Circle(
@@ -142,9 +144,6 @@ api.getSelf = function() {
 
 //! Gets the foods information.
 api.getOpponents = function() {
-  if (!api.isInitialized()) {
-    return [];
-  }
   var players = {};
   for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
     if (!cs[i].isVirus && !api._isOurCircle(cs[i])) {
@@ -163,9 +162,41 @@ api.getOpponents = function() {
 };
 
 
-//! Returns true if this api is initialized.
-api.isInitialized = function() {
-  return api._initialized === true;
+api.isInitialized = function() { return api._initialized; };
+
+api.isUserOwnMove = function() { return api._userOwnMove; }
+
+api.setIsUserOwnMove = function(flag) {
+  api._userOwnMove = flag;
+  if (flag) {
+    api._canvas.onmousemove = api._canvasEventHandlers.onmousemove;
+  } else {
+    api._canvas.onmousemove = null;
+  }
+};
+
+api.isUserOwnAttack = function() { return api._userOwnAttack; };
+
+api.setIsUserOwnAttack = function(flag) {
+  api._userOwnAttack = flag;
+  if (flag) {
+    api._allowedKeyCodes['w'] = true;
+    api._allowedKeyCodes['W'] = true;
+  } else {
+    delete api._allowedKeyCodes['w'];
+    delete api._allowedKeyCodes['W'];
+  }
+};
+
+api.isUserOwnSplit = function() { return api._userOwnSplit; };
+
+api.setIsUserOwnSplit = function(flag) {
+  api._userOwnSplit = flag;
+  if (flag) {
+    api._allowedKeyCodes[' '] = true;
+  } else {
+    delete api._allowedKeyCodes[' '];
+  }
 };
 
 
@@ -184,73 +215,15 @@ api.registerKeyboardHandler = function(chr, handler) {
 };
 
 
-//! Toggle the controller of move action between user and the ai.
-api.toggleMouseController = function() {
-  if (!api.isInitialized()) {
-    return;
-  }
-  if (api._userControlMouse) {
-    api._canvas.onmousemove = null;
-    api._userControlMouse = false;
-  } else {
-    api._canvas.onmousemove = api._canvasEventHandlers.onmousemove;
-    api._userControlMouse = true;
-  }
-};
-
-
-//! Toggle the controller of attack/split action between user and the ai.
-api.toggleKeyboardController = function() {
-  if (!api.isInitialized()) {
-    return;
-  }
-  api._userControlKeyboard = !api._userControlKeyboard;
-};
-
-
-//! Checks whether the user has own the keyboard control permisson or not.
-api.isUserOwnMouse = function() {
-  return api._userControlMouse;
-}
-
-
-//! Checks whether the user has own the keyboard control permisson or not.
-api.isUserOwnKeyboard = function() {
-  return api._userControlKeyboard;
-}
-
-
 //! Initializes all things.
 //! Including function/variable declarations.
 api.init = function() {
-  //! reference to the canvas tag, it will be initialized in originalInit().
-  api._canvas = null;
-
-  //! contains all the original canvas' event handlers, inititialized in
-  //! _replaceEventHandlers().
-  api._canvasEventHandlers = {};
-
-  //! contains all the original window's event handlers, inititialized in
-  //! _replaceEventHandlers().
-  api._windowEventHandlers = {};
-
-  //! name of our circles, setup by `setSelfName()` function.
-  api._name = null;
-
-  //! whether the user own the control permission of the mouse.
-  api._userControlMouse = false;
-
-  //! whether the user own the control permission of the keyboard.
-  api._userControlKeyboard = false;
-
   api.originalInit();
 
   api._replaceEventHandlers();
 
   window.onkeydown = api._keydownHandler;
   window.onkeyup = api._keyupHandler;
-  api.registerKeyboardHandler('mM', api.toggleMouseController);
-  api.registerKeyboardHandler('aA', api.toggleKeyboardController);
 
   api._initialized = true;
 };
@@ -280,22 +253,22 @@ api._keydownHandler = function(evt) {
   if (api._keydownHandler.handlers.hasOwnProperty(evt.keyCode)) {
     return api._keydownHandler.handlers[evt.keyCode](evt);
   }
-  if (api.isUserOwnKeyboard()) {
+  if (api._allowedKeyCodes.hasOwnProperty(String.fromCharCode(evt.keyCode))) {
     return api._windowEventHandlers.onkeydown(evt);
-  }
-};
-
-
-//! window's key up handler.
-api._keyupHandler = function(evt) {
-  if (api.isUserOwnKeyboard()) {
-    return api._windowEventHandlers.onkeyup(evt);
   }
 };
 
 
 //! handlers for specified key.
 api._keydownHandler.handlers = {};
+
+
+//! window's key up handler.
+api._keyupHandler = function(evt) {
+  if (api._allowedKeyCodes.hasOwnProperty(String.fromCharCode(evt.keyCode))) {
+    return api._windowEventHandlers.onkeyup(evt);
+  }
+};
 
 
 //! Checks whether the gived circle is our body or not.
@@ -339,6 +312,44 @@ api._getDictOfCircles = function() {
 api._getListOfOurCircles = function() {
   console.log('no implementation here');
 };
+
+
+//! Whether this module is initialized or not.
+api._initialized = false;
+
+
+//! Whether the user can control the mouse or not.
+api._userOwnMove = false;
+
+
+//! Whether the user can control the keyboard or not.
+api._userOwnAttack = false;
+
+
+//! Whether the user can control the keyboard or not.
+api._userOwnSplit = false;
+
+
+//! reference to the canvas tag, it will be initialized in originalInit().
+api._canvas = null;
+
+
+//! contains all the original canvas' event handlers, inititialized in
+//! _replaceEventHandlers().
+api._canvasEventHandlers = {};
+
+
+//! contains all the original window's event handlers, inititialized in
+//! _replaceEventHandlers().
+api._windowEventHandlers = {};
+
+
+//! Allowed key codes for passing to the original keyboard event handlers.
+api._allowedKeyCodes = {};
+
+
+//! name of our circles, setup by `setSelfName()` function.
+api._name = null;
 
 
 //! The original initial function of agar.io.
