@@ -82,7 +82,7 @@ function split();  // Splits the body.
 ## Potential strategies for our agent
 
 |Strategy Name|Who|Description|
-|:------------|:--||:----------|
+|:------------|:--|:----------|
 |ESIGUAY|L|eats as many pieces of food as possible.|
 |DANXIAOGUAY|?|tries to keep a certain distance against enemies bigger than self.|
 |HENEDEDANXIAOGUAY|C|a mixture of DANXIAOGUAY and ESIGUAY.|
