@@ -51,9 +51,9 @@ A Google Chrome extension for invincible AI on agar.io, a popular web-based game
 
 |Member|Responsibility|Priority|Done?|
 |:-----|:-------------|:------:|:---:|
-|sycLin| | | |
-|lunaivory| | | |
-|cathook| | | |
+|sycLin|GONGJIGUAY|1|*on-going*|
+|lunaivory|ESIGUAY|1|*on-going*|
+|cathook|APIs + HENEDEDANXIAOGUAY|0 + 1|*on-going*|
 |benchou1919| | | |
 
 
