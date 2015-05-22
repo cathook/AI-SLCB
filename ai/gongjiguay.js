@@ -10,7 +10,8 @@ ai.gongjiguay.start = function() {
 
 //! Stops using this agent.
 ai.gongjiguay.stop = function() {
-	;
+	ai.gongjiguay._runFlag = false;
+	api.removeMark(ai.gongjiguay._targetPoint);
 };
 
 // need some arguments?
