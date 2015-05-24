@@ -21,7 +21,7 @@ extension.initFunc = function() {
 
   api.setDrawingMode({direction : true,
                       safeCircle : true,
-                      attackRange : false,
+                      attackRange : true,
                       opponentsAttackRange : false});
 
   api.setSelfName('AI');
