@@ -1,458 +1,329 @@
-var api = api || {};  //!< namespace api
+var api = api || {};  //!< @namespace api
+
+api.agar = api.agar || {};  //!< @namespace api.agar
 
 
-//! 2D position structure.
-//!
-//! struct variables:
-//!   x: the x-coordinate.
-//!   y: the y-coordinate.
-//!
-//! @param [in] x The x coordinate.
-//! @param [in] y The y coordinate.
-api.Position = util.Vector2D;
+/*!
+ * @function Initializes this module.
+ *
+ * @param [in] util The dependency module `util`.
+ * @param [in] math The dependency module `math`.
+ */
+api.agar.init = function(util, math) {
+  /*!
+   * @struct A round body.
+   *
+   * @var name The name of this body.
+   * @var center The center of the circle.
+   * @var radius The radius of the circle.
+   * @var velocity The current velocity of this body.
+   * @var _delta The (nx, ny) minus (ox, oy)
+   * @var _t0 t
+   */
+  api.agar.CircleInfo = function(agarCircle) {
+    this.name = agarCircle.name;
+    this.center = new math.Vector2D(agarCircle.x, agarCircle.y);
+    this.radius = agarCircle.size;
+    this._delta = new math.Vector2D(agarCircle.nx - agarCircle.ox,
+                                    agarCircle.ny - agarCircle.oy);
+    this._t0 = agarCircle.updateTime;
+
+    this.velocity = null;
+    this.updateVelocity();
+  };
+
+  /*!
+   * @function Updates the velocity to the current time.
+   */
+  api.agar.CircleInfo.prototype.updateVelocity = function() {
+    var t = Math.max(0, Math.min(1, ((+new Date()) - this._t0) / 120));
+    var u = -6 * t * t + 6 * t;  // f(t) = -2t^3 + 3t^2, df(t)/dt = -6t^2 + 6t
+    this.velocity = this._delta.times(u);
+  };
 
 
-//! A circle structure.
-//!
-//! struct variables:
-//!   center: An instance of `api.Position`, the center of this circle.
-//!   radius: Radius of the circle.
-//!   direction: The direction this circle move.
-//!
-//! @param [in] center The center of the circle.
-//! @param [in] radius The radius of the circle.
-//! @param [in] direction The direction.
-api.CircleBody = function(center, radius, direction) {
-  this.center = center;
-  this.radius = radius;
-  this.direction = direction;
-};
+  /*!
+   * @function Touches off an mousemove event.
+   *
+   * @param [in] evt The event object.
+   */
+  api.agar.mouseMove = function(evt) {
+    api.agar._canvasEventHandlers.onmousemove(evt);
+  };
 
 
-//! A player.
-//!
-//! struct variables:
-//!   name: The name of this player.
-//!   circles: A list of circle, body of this player.
-//!
-//! @param [in] name The name of this agent.
-//! @param [in] circles: A list of circle.
-api.Player = function(name, circles) {
-  this.name = name;
-  this.circles = circles;
-};
+  /*!
+   * @function Touches off an keydown event.
+   *
+   * @param [in] evt The event object.
+   */
+  api.agar.keyDown = function(evt) {
+    api.agar._windowEventHandlers.onkeydown(evt);
+  };
 
 
-//! An arrow.
-//!
-//! struct variables:
-//!   from: an position.
-//!   to: an position.
-//!   color: color to draw.
-api.Arrow = function(from, to, color) {
-  this.from = from;
-  this.to = to;
-  this.color = color;
-};
+  /*!
+   * @function Touches off an keyup event.
+   *
+   * @param [in] evt The event object.
+   */
+  api.agar.keyUp = function(evt) {
+    api.agar._windowEventHandlers.onkeyup(evt);
+  };
 
 
-//! A point.
-//!
-//! struct variables:
-//!   position: an position.
-//!   color: color to draw.
-//!   type: a type.
-api.MarkPoint = function(pos, color, type) {
-  this.position = pos;
-  this.color = color;
-  this.type = type;
-};
+  /*!
+   * @function Sets the name.
+   *
+   * @param [in] name The name.
+   */
+  api.agar.setSelfName = function(name) {
+    document.getElementById('nick').value = name;
+  };
 
 
-//! Types of point.
-api.MarkPointType = new util.Enum('TARGET', 'X');
+  /*!
+   * @function Sets the region to join.
+   *
+   * @param [in] region The region.
+   */
+  api.agar.setRegion = function(region) {
+    document.getElementById('region').value = region;
+    document.getElementById('region').onchange();
+  };
 
 
-//! A circle range.
-//!
-//! struct variables:
-//!   center: an position.
-//!   radius: the radius.
-//!   color: color to draw.
-//!   type: a type.
-api.CircleRange = function(center, radius, color, type) {
-  this.center = center;
-  this.radius = radius;
-  this.color = color;
-  this.type = type;
-};
+  /*!
+   * @function Gets our circles information.
+   */
+  api.agar.getOurCirclesInfo = function() {
+    api.agar._tryUpdateCirclesInfo(api.agar._ourCirclesInfo);
+    return api.agar._ourCirclesInfo;
+  };
 
 
-api.CircleRangeType = new util.Enum('DOTTED');
+  /*!
+   * @function Gets spike circles information.
+   */
+  api.agar.getSpikeCirclesInfo = function() {
+    api.agar._tryUpdateCirclesInfo(api.agar._spikeCirclesInfo);
+    return api.agar._spikeCirclesInfo;
+  };
 
 
-//! Initializes all things.
-//! Including function/variable declarations.
-api.init = function() {
-  api.originalInit();
-
-  api._replaceEventHandlers();
-
-  window.onkeydown = api._keydownHandler;
-  window.onkeyup = api._keyupHandler;
-
-  api._initialized = true;
-};
+  /*!
+   * @function Gets other circles information.
+   */
+  api.agar.getOtherCirclesInfo = function() {
+    api.agar._tryUpdateCirclesInfo(api.agar._otherCirclesInfo);
+    return api.agar._otherCirclesInfo;
+  };
 
 
-//! Lets the api module knows the name of the our circles.
-//! @param [in] name The name.
-api.setSelfName = function(name) {
-  api._name = name;
-  document.getElementById('nick').value = name;
-};
+  /*!
+   * @function Gets the window size.
+   *
+   * @return An instance of math.Vector2D, where `x` be the width and `y` be
+   *     the height.
+   */
+  api.agar.getWindowSize = function() {
+    throw util.NoImplementation();
+  };
 
 
-api.setRegion = function(region) {
-  document.getElementById('region').value = region;
-  document.getElementById('region').onchange();
-};
+  /*!
+   * @function Gets the world coordinate of the center of the window.
+   */
+  api.agar.getWindowCenterCoord = function() {
+    throw util.NoImplementation();
+  };
 
 
-//! Sets the target position.
-//! @param [in] pos A dict, which (pos.x, pos.y) be the position.
-//! @param [in] useWindowCoord An optional argument, specifies whether this
-//!    function should treat pos as the window coordinate or not.
-api.setTargetPosition = function(pos, useWindowCoord) {
-  if (api.isUserOwnMove()) {
-    return;
-  }
-  if (useWindowCoord === true) {
-    api._canvasEventHandlers.onmousemove(
-        {clientX : pos.x, clientY : pos.y});
-  } else {
-    var c = api._getWindowCenterCoord();
-    var s = api._getScale();
-    var r = api._getWindowRect();
-    api._canvasEventHandlers.onmousemove(
-        {clientX : (pos.x - c.x) * s + r.x / 2,
-         clientY : (pos.y - c.y) * s + r.y / 2});
-  }
-};
+  /*!
+   * @function Gets the world scale.
+   */
+  api.agar.getScale = function() {
+    throw util.NoImplementation();
+  };
 
 
-//! Splits the agent.
-api.split = function() {
-  if (api.isUserOwnSplit()) {
-    return;
-  }
-  api._windowEventHandlers.onkeydown({keyCode : 32});
-  window.setTimeout(
-      function() { api._windowEventHandlers.onkeyup({keyCode : 32}); }, 100);
-};
+  /*!
+   * @function Gets the world size.
+   *
+   * @return An instance of api.agar.Position, which x be the width and y be the
+   *     height of the world.
+   */
+  api.agar.getWorldSize = function() {
+    return new api.agar.Position(11180, 11180);
+  };
 
 
-//! Lets the agent attack by throwing an little body.
-api.attack = function() {
-  if (api.isUserOwnAttack()) {
-    return;
-  }
-  api._windowEventHandlers.onkeydown({keyCode : 87});
-  window.setTimeout(
-      function() { api._windowEventHandlers.onkeyup({keyCode : 32}); }, 100);
-};
+  /*!
+   * @function Gets the maximux attack distance by the given radius.
+   *
+   * @param [in] radius The radius to estimeate.
+   *
+   * @return A number.
+   */
+  api.agar.getDangerRadius = function() {
+    return 800;
+  };
 
 
-//! Gets the foods information.
-api.getFoods = function() {
-  var r = Number.POSITIVE_INFINITY;
-  for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
-    r = Math.min(r, cs[i].size);
-  }
-  var ret = [];
-  for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
-    if (!cs[i].destroyed &&
-        !cs[i].isVirus &&
-        !api._isOurCircle(cs[i]) && cs[i].size < r) {
-      ret.push(new api.CircleBody(new api.Position(cs[i].x, cs[i].y),
-                                  cs[i].size,
-                                  new util.Vector2D(cs[i].nx - cs[i].ox,
-                                                    cs[i].ny - cs[i].oy)));
-    }
-  }
-  return ret;
-};
+  /*!
+   * @function Gets little radius if it splits.
+   *
+   * @param [in] radius The radius to estimate.
+   *
+   * @return A number.
+   */
+  api.agar.getSplittedRadius = function(radius) {
+    return radius / Math.sqrt(2);
+  };
 
 
-//! Gets the foods information.
-api.getSpikes = function() {
-  var ret = [];
-  for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
-    if (cs[i].isVirus && !cs[i].destroyed) {
-      ret.push(new api.CircleBody(new api.Position(cs[i].x, cs[i].y),
-                                  cs[i].size,
-                                  new util.Vector2D(cs[i].nx - cs[i].ox,
-                                                    cs[i].ny - cs[i].oy)));
-    }
-  }
-  return ret;
-};
+  /*!
+   * @function Transforms the gived world coordinate to the window coordinate.
+   *
+   * @param [in] worldCoord The coordinate to be transformed.
+   */
+  api.agar.toWindowCoord = function(worldCoord) {
+    var c = api.agar.getWindowCenterCoord();
+    var s = api.agar.getScale();
+    var w = api.agar.getWindowSize();
+    return worldCoord.minus(c).times(s).add(w.div(2));
+  };
 
 
-//! Gets the foods information.
-api.getSelf = function() {
-  var selfCircles = [];
-  for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
-    selfCircles.push(new api.CircleBody(
-        new api.Position(cs[i].x, cs[i].y), cs[i].size,
-        new util.Vector2D(cs[i].nx - cs[i].ox, cs[i].ny - cs[i].oy)));
-  }
-  return new api.Player(api._name, selfCircles);
-};
+  /*!
+   * @function Adds a function which will be called while rendering the canvas.
+   *
+   * @param [in] func The function with one argument, which is the canvas to draw
+   *     on.
+   */
+  api.agar.addDrawFunc = function(func) {
+    api.agar._drawFuncs.add(func);
+  };
 
 
-//! Gets the foods information.
-api.getOpponents = function() {
-  var r = Number.POSITIVE_INFINITY;
-  for (var i = 0, cs = api._getListOfOurCircles(); i < cs.length; ++i) {
-    r = Math.min(r, cs[i].size);
-  }
-  var players = {};
-  for (var i = 0, cs = api._getListOfCircles(); i < cs.length; ++i) {
-    if (!cs[i].destroyed && !cs[i].isVirus && !api._isOurCircle(cs[i]) &&
-        cs[i].size > r) {
-      if (!players.hasOwnProperty(cs[i].name)) {
-        players[cs[i].name] = [];
+  /*!
+   * @function Removes a function which will be called while rendering the canvas.
+   *
+   * @param [in] func The function to be removed.
+   *     on.
+   */
+  api.agar.removeDrawFunc = function(func) {
+    api.agar._drawFuncs.remove(func);
+  };
+
+
+  /*!
+   * @function Replaces the original event handlers.
+   *
+   * @param [in] w A reference to window.
+   * @param [in] c A reference to canvas.
+   */
+  api.agar._replaceEventHandlers = function(w, c) {
+    var forEach = function(lst, org, backupDict) {
+      for (var i = 0; i < lst.length; ++i) {
+        backupDict[lst[i]] = org[lst[i]];
+        org[lst[i]] = null;
       }
-      players[cs[i].name].push(new api.CircleBody(
-          new api.Position(cs[i].x, cs[i].y),
-          cs[i].size,
-          new util.Vector2D(cs[i].nx - cs[i].ox, cs[i].ny - cs[i].oy)));
+    };
+    forEach(['onkeydown', 'onkeyup', 'onblur'],
+            w, api.agar._windowEventHandlers);
+    forEach(['onmousemove', 'onmousedown'],
+            c, api.agar._canvasEventHandlers);
+  };
+
+
+  /*!
+   * @function Tries to update the circles information.
+   */
+  api.agar._tryUpdateCirclesInfo = function() {
+    if (api.agar._circlesInfoChanged) {
+      api.agar._updateCirclesInfo();
+    } else {
+      for (var i = 0; i < arguments.length; ++i) {
+        for (var j = 0; j < arguments[i].length; ++j) {
+          arguments[i][j].updateVelocity();
+        }
+      }
     }
-  }
-  var ret = [];
-  for (var name in players) {
-    ret.push(new api.Player(name, players[name]));
-  }
-  return ret;
-};
-
-
-api.getMapRect = function() { return new api.Position(11180, 11180); };
-
+  };
 
-api.estimateDangerRadius = function(radius) {
-  return 800;
-};
-
-
-api.isInitialized = function() { return api._initialized; };
-
-
-api.isUserOwnMove = function() { return api._userOwnMove; }
-
-
-api.setIsUserOwnMove = function(flag) {
-  api._userOwnMove = flag;
-  if (flag) {
-    api._canvas.onmousemove = api._canvasEventHandlers.onmousemove;
-  } else {
-    api._canvas.onmousemove = null;
-  }
-};
-
-
-api.isUserOwnAttack = function() { return api._userOwnAttack; };
+  /*!
+   * @function Updates the circle informations.
+   */
+  api.agar._updateCirclesInfo = function() {
+    throw util.NoImplementation();
+  };
 
 
-api.setIsUserOwnAttack = function(flag) {
-  api._userOwnAttack = flag;
-  if (flag) {
-    api._allowedKeyCodes['w'] = true;
-    api._allowedKeyCodes['W'] = true;
-  } else {
-    delete api._allowedKeyCodes['w'];
-    delete api._allowedKeyCodes['W'];
-  }
-};
+  /*!
+   * @function Calls all the drawing functions.
+   *
+   * @param [in] canvas The canvas to draw on.
+   */
+  api.agar._draw = function(canvas) {
+    api.agar._drawFuncs.forEach(function(func) { func(canvas); });
+  };
 
 
-api.isUserOwnSplit = function() { return api._userOwnSplit; };
+  /*!
+   * @var Contains all the original window's event handlers.
+   */
+  api.agar._windowEventHandlers = {};
 
 
-api.setIsUserOwnSplit = function(flag) {
-  api._userOwnSplit = flag;
-  if (flag) {
-    api._allowedKeyCodes[' '] = true;
-  } else {
-    delete api._allowedKeyCodes[' '];
-  }
-};
+  /*!
+   * @var Contains all the original canvas' event handlers.
+   */
+  api.agar._canvasEventHandlers = {};
 
 
-//! Registers a keydown event handler for specify char.
-//!
-//! @param [in] chr The char.
-//! @param [in] handler The handler function.
-api.registerKeyboardHandler = function(chr, handler) {
-  if (typeof(chr) == 'string') {
-    for (var i = 0; i < chr.length; ++i) {
-      api.registerKeyboardHandler(chr.charCodeAt(i), handler);
-    }
-  } else {
-    api._keydownHandler.handlers[chr] = handler;
-  }
-};
+  /*!
+   * @var Whether the circles information are changed or not.
+   */
+  api.agar._circlesInfoChanged = false;
 
 
-api.addMark = function(m) {
-  if (api._marks.indexOf(m) <= 0) {
-    api._marks.push(m);
-  }
-};
+  /*!
+   * @var Caches our circles' information.
+   */
+  api.agar._ourCirclesInfo = [];
 
 
-api.removeMark = function(m) {
-  var index = api._marks.indexOf(m);
-  if (index >= 0) {
-    api._marks[index] = api._marks[api._marks.length - 1];
-    api._marks.pop();
-  }
-};
+  /*!
+   * @var Caches spike circles' information.
+   */
+  api.agar._spikeCirclesInfo = [];
 
 
-//! Replaces the event handlers of canvas for disable the user's control.
-api._replaceEventHandlers = function() {
-  api._canvasEventHandlers = {};
-  api._windowEventHandlers = {};
-  for (var i = 0, es = ['mousedown', 'mouseup', 'mousemove'];
-       i < es.length;
-       ++i) {
-    var e = 'on' + es[i];
-    api._canvasEventHandlers[e] = api._canvas[e];
-    api._canvas[e] = null;
-  }
-  for (var i = 0, es = ['keydown', 'keyup', 'blur']; i < es.length; ++i) {
-    var e = 'on' + es[i];
-    api._windowEventHandlers[e] = window[e];
-    window[e] = null;
-  }
-};
+  /*!
+   * @var Caches other circles' information.
+   */
+  api.agar._otherCirclesInfo = [];
 
 
-//! window's key down handler.
-api._keydownHandler = function(evt) {
-  if (api._keydownHandler.handlers.hasOwnProperty(evt.keyCode)) {
-    return api._keydownHandler.handlers[evt.keyCode](evt);
-  }
-  if (api._allowedKeyCodes.hasOwnProperty(String.fromCharCode(evt.keyCode))) {
-    return api._windowEventHandlers.onkeydown(evt);
-  }
-};
+  /*!
+   * @var A set of functions.
+   */
+  api.agar._drawFuncs = new util.Set();
 
 
-//! handlers for specified key.
-api._keydownHandler.handlers = {};
-
-
-//! window's key up handler.
-api._keyupHandler = function(evt) {
-  if (api._allowedKeyCodes.hasOwnProperty(String.fromCharCode(evt.keyCode))) {
-    return api._windowEventHandlers.onkeyup(evt);
-  }
-};
-
-
-//! Checks whether the gived circle is our body or not.
-//! @param [in] c The circle to be checked.
-api._isOurCircle = function(c) {
-  return (api._getListOfOurCircles().indexOf(c) >= 0);
-};
-
-
-//! Gets the window center.
-api._getWindowCenterCoord = function() {
-  console.log('no implementation here');
-};
-
-
-//! Gets the scale factor.
-api._getScale = function() {
-  console.log('no implementation here');
-};
-
-
-//! Gets the window size (x = width, y = height).
-api._getWindowRect = function() {
-  console.log('no implementation here');
-};
-
-
-//! Backdoors for the variable `q`.
-api._getListOfCircles = function() {
-  console.log('no implementation here');
-};
-
-
-//! Backdoors for the variable `w`.
-api._getDictOfCircles = function() {
-  console.log('no implementation here');
-};
-
-
-//! Backdoors for the variable `g`.
-api._getListOfOurCircles = function() {
-  console.log('no implementation here');
-};
-
-
-//! Whether this module is initialized or not.
-api._initialized = false;
-
-
-//! Whether the user can control the mouse or not.
-api._userOwnMove = false;
-
-
-//! Whether the user can control the keyboard or not.
-api._userOwnAttack = false;
-
-
-//! Whether the user can control the keyboard or not.
-api._userOwnSplit = false;
-
-
-//! reference to the canvas tag, it will be initialized in originalInit().
-api._canvas = null;
-
-
-//! contains all the original canvas' event handlers, inititialized in
-//! _replaceEventHandlers().
-api._canvasEventHandlers = {};
-
-
-//! contains all the original window's event handlers, inititialized in
-//! _replaceEventHandlers().
-api._windowEventHandlers = {};
-
-
-//! Allowed key codes for passing to the original keyboard event handlers.
-api._allowedKeyCodes = {};
-
-
-//! name of our circles, setup by `setSelfName()` function.
-api._name = null;
-
-
-api._marks = [];
-
-
-//! The original initial function of agar.io.
-api.originalInit = function() {
+  //////////////////////////////////////////////////////////
+  //
+  // The codes below is the original agar.io's main js code.
+  //
+  // Note: The lines we insert for opening some backdoor will
+  //     be followed a comment "meow".
+  //
+  //////////////////////////////////////////////////////////
   f = window;
   r = jQuery;
 
-  //! Initialize function, it will setup the event handlers.
+  // Initialize function, it will setup the event handlers.
   function ya() {
     ia();
     setInterval(ia, 18E4);
@@ -498,17 +369,18 @@ api.originalInit = function() {
       c = b = a = !1
     };
     f.onresize = ka;
+
+    api.agar._replaceEventHandlers(f, z);  // meow
+
     ka();
     f.requestAnimationFrame ? f.requestAnimationFrame(la) : setInterval(ba, 1E3 / 60);
     setInterval(G, 40);
     ma(r("#region").val());
     r("#overlays").show()
-
-    api._canvas = z;  //!< initialize.
   }
 
-  //! Creates a QUAD tree, put all data into it.
-  //! Called by `ba()`.
+  // Creates a QUAD tree, put all data into it.
+  // Called by `ba()`.
   function za() {
     if (.5 > h) H = null;
     else {
@@ -525,7 +397,7 @@ api.originalInit = function() {
     }
   }
 
-  //! Transform the window coordinate (O, P) to the absolute coordinate (Q, R)
+  // Transform the window coordinate (O, P) to the absolute coordinate (Q, R)
   function aa() {
     Q = (O - p / 2) / h + s;
     R = (P - m / 2) / h + t
@@ -581,9 +453,8 @@ api.originalInit = function() {
     I && (r("#connecting").show(), oa())
   }
 
-  //! Connects to the websocket server.
-  //! Called by `oa()`
-  //! @param [in] a The server name.
+  // Connects to the websocket server.
+  // Called by `oa()`
   function pa(a) {
     if (l) {
       l.onopen = null;
@@ -613,8 +484,8 @@ api.originalInit = function() {
     }
   }
 
-  //! After the socket opened, do some initialize...
-  //! It is the onopen event handler for the websocket.
+  // After the socket opened, do some initialize...
+  // It is the onopen event handler for the websocket.
   function Aa(a) {
     r("#connecting").hide();
     console.log("socket open");
@@ -631,14 +502,14 @@ api.originalInit = function() {
     qa()
   }
 
-  //! Shows some message right after the websocket is closed.
-  //! It is the onclose event handler for the websocket.
+  // Shows some message right after the websocket is closed.
+  // It is the onclose event handler for the websocket.
   function Ca(a) {
     console.log("socket close");
     setTimeout(ca, 500)
   }
 
-  //! Message handler for the websocket.
+  // Message handler for the websocket.
   function Ba(a) {
     function b() {
       for (var a = "";;) {
@@ -694,8 +565,10 @@ api.originalInit = function() {
     }
   }
 
-  //! Sync the circles data.
+  // Sync the circles data.
   function Da(a) {
+    api.agar._circlesInfoChanged = true;  // meow
+
     E = +new Date;
     var b = Math.random(),
       c = 1;
@@ -757,7 +630,7 @@ api.originalInit = function() {
     da && 0 == g.length && r("#overlays").fadeIn(3E3)
   }
 
-  //! Sends some information to the websocket server...
+  // Sends some information to the websocket server...
   function G() {
     if (ea()) {
       var a = O - p / 2,
@@ -766,7 +639,7 @@ api.originalInit = function() {
     }
   }
 
-  //! Sends the array `N` to the server.
+  // Sends the array `N` to the server.
   function qa() {
     if (ea() && null != N) {
       var a = new ArrayBuffer(1 + 2 * N.length),
@@ -777,12 +650,12 @@ api.originalInit = function() {
     }
   }
 
-  //! Checks whether the websocket is opened or not.
+  // Checks whether the websocket is opened or not.
   function ea() {
     return null != l && l.readyState == l.OPEN
   }
 
-  //! Sents a 8-bit int to the server.
+  // Sents a 8-bit int to the server.
   function A(a) {
     if (ea()) {
       var b = new ArrayBuffer(1);
@@ -791,7 +664,7 @@ api.originalInit = function() {
     }
   }
 
-  //! Drawing and drawing...
+  // Drawing and drawing...
   function la() {
     ba();
     f.requestAnimationFrame(la)
@@ -814,7 +687,7 @@ api.originalInit = function() {
     }
   }
 
-  //! Something likes re-draw and update...
+  // Something likes re-draw and update...
   function ba() {
     var a = +new Date;
     ++Fa;
@@ -851,8 +724,9 @@ api.originalInit = function() {
     e.translate(-s, -t);
     for (d = 0; d < C.length; d++) C[d].draw();
     for (d = 0; d < q.length; d++) q[d].draw();
-    updateCircleMarks();
-    drawMarks();
+
+    api.agar._draw(e);  // meow
+
     e.restore();
     x && e.drawImage(x, p - x.width - 10, 10);
     D = Math.max(D, Ga());
@@ -863,146 +737,7 @@ api.originalInit = function() {
     1 < v && (v = 1)
   }
 
-  var updateCircleMarks = (function() {
-    var circles = {};
-    var me = {};
-    return function() {
-      for (var id in circles) {
-        circles[id].updated = false;
-      }
-      for (var id in me) {
-        me[id].updated = false;
-      }
-      for (var i = 0; i < q.length; ++i) {
-        if (!circles.hasOwnProperty(q[i].id)) {
-          circles[q[i].id] = {updated : true,
-                              arrow : new api.Arrow(new api.Position(),
-                                                    new api.Position(),
-                                                    '#000000'),
-                              range : new api.CircleRange(
-                                  new api.Position(), 0, '#000000',
-                                  api.CircleRangeType.DOTTED)};
-          api.addMark(circles[q[i].id].arrow);
-//          api.addMark(circles[q[i].id].range);
-        }
-        if (g.indexOf(q[i]) >= 0) {
-          if (!me.hasOwnProperty(q[i].id)) {
-            me[q[i].id] = {updated : true, ranges : []};
-            for (var r = 800; r <= 800; r += 100) {
-              var c = new api.CircleRange(new api.Position(), r, '#000000',
-                                          api.CircleRangeType.DOTTED);
-              me[q[i].id].ranges.push(c);
-              api.addMark(c);
-            }
-          }
-          for (var j = 0; j < me[q[i].id].ranges.length; ++j) {
-            me[q[i].id].ranges[j].center.x = q[i].x;
-            me[q[i].id].ranges[j].center.y = q[i].y;
-          }
-        }
-        circles[q[i].id].updated = true;
-        circles[q[i].id].arrow.from.x = q[i].ox;
-        circles[q[i].id].arrow.from.y = q[i].oy;
-        circles[q[i].id].arrow.to.x = q[i].nx;
-        circles[q[i].id].arrow.to.y = q[i].ny;
-        circles[q[i].id].range.center.x = q[i].x;
-        circles[q[i].id].range.center.y = q[i].y;
-        circles[q[i].id].range.radius = api.estimateDangerRadius(q[i].size);
-      }
-      for (var id in circles) {
-        if (!circles[id].updated) {
-          api.removeMark(circles[id].arrow);
-//          api.removeMark(circles[id].range);
-          delete circles[id];
-        }
-      }
-      for (var id in me) {
-        if (!me[id].updated) {
-          for (var i = 0; i < me[id].ranges.length; ++i) {
-            api.removeMark(me[id].ranges[i]);
-          }
-          delete me[id];
-        }
-      }
-    };
-  })();
-
-
-  //! Drawing the marks.
-  function drawMarks() {
-    e.save();
-    e.lineCap = 'round';
-    for (var i = 0; i < api._marks.length; ++i) {
-      if (api._marks[i] instanceof api.Arrow) {
-        drawArrow(api._marks[i]);
-      } else if (api._marks[i] instanceof api.MarkPoint) {
-        drawMarkPoint(api._marks[i]);
-      } else if (api._marks[i] instanceof api.CircleRange) {
-        drawCircleRange(api._marks[i]);
-      }
-    }
-    e.restore();
-  }
-
-  function drawArrow(arr) {
-    var v0 = arr.from.minus(arr.to);
-    var v1 = v0.rotate(Math.PI / 6).div(3);
-    var v2 = v0.rotate(-Math.PI / 6).div(3);
-    e.strokeStyle = arr.color;
-    e.lineWidth = 10;
-    drawLine(arr.from, arr.to);
-    drawLine(arr.to, arr.to.add(v1));
-    drawLine(arr.to, arr.to.add(v2));
-  }
-
-  function drawMarkPoint(p) {
-    if (p.type == api.MarkPointType.TARGET) {
-      e.strokeStyle = p.color;
-      e.lineWidth = 5;
-      var r = 40;
-      drawLine(p.position.minus(new util.Vector2D(r, 0)),
-               p.position.add(new util.Vector2D(r, 0)));
-      drawLine(p.position.minus(new util.Vector2D(0, r)),
-               p.position.add(new util.Vector2D(0, r)));
-      drawCircle(p.position, r / 2);
-    } else if (p.type == api.MarkPointType.X) {
-      e.strokeStyle = p.color;
-      e.lineWidth = 5;
-      var r = 40;
-      drawLine(p.position.minus(new util.Vector2D(r, r)),
-               p.position.add(new util.Vector2D(r, r)));
-      drawLine(p.position.minus(new util.Vector2D(-r, r)),
-               p.position.add(new util.Vector2D(-r, r)));
-    }
-  }
-
-  function drawCircleRange(cr) {
-    if (cr.type == api.CircleRangeType.DOTTED) {
-      e.save();
-      e.strokeStyle = cr.color;
-      e.lineWidth = 5;
-      e.setLineDash([5, 15]);
-      drawCircle(cr.center, cr.radius);
-      e.restore();
-    }
-  }
-
-  //! Draws a line.
-  function drawLine(a, b) {
-    e.beginPath();
-    e.moveTo(a.x, a.y);
-    e.lineTo(b.x, b.y);
-    e.stroke();
-  }
-
-  //! Draws a circle.
-  function drawCircle(c, r) {
-    e.beginPath();
-    e.arc(c.x, c.y, r, 0, Math.PI * 2);
-    e.stroke();
-  }
-
-  //! Called by `ba()`
+  // Called by `ba()`
   function Ha() {
     if (ja && ga.width) {
       var a = p / 5;
@@ -1010,15 +745,15 @@ api.originalInit = function() {
     }
   }
 
-  //! Called by `ba()`, calculate the sum of areas of our circles.
+  // Called by `ba()`, calculate the sum of areas of our circles.
   function Ga() {
     for (var a = 0, b = 0; b < g.length; b++) a += g[b].nSize * g[b].nSize;
     return a
   }
 
-  //! Renders the leaderboard.
-  //! Called by `Ba()`, seems that it will be called while the leaderboard
-  //! changed.
+  // Renders the leaderboard.
+  // Called by `Ba()`, seems that it will be called while the leaderboard
+  // changed.
   function ra() {
     x = null;
     if (null != u || 0 != y.length)
@@ -1062,8 +797,8 @@ api.originalInit = function() {
     this.setName(f)
   }
 
-  //! A class for text block.
-  //! Use for "score", "name" of the agent...
+  // A class for text block.
+  // Use for "score", "name" of the agent...
   function Y(a, b, c, d) {
     a && (this._size = a);
     b && (this._color = b);
@@ -1128,13 +863,34 @@ api.originalInit = function() {
       ja = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
       ga = new Image;
 
-    // Backdoors for access some variables.
-    api._getWindowCenterCoord = function() { return new api.Position(s, t); };
-    api._getScale = function() { return h; };
-    api._getWindowRect = function() { return new api.Position(p, m); };
-    api._getListOfCircles = function() { return q; };
-    api._getDictOfCircles = function() { return w; };
-    api._getListOfOurCircles = function() { return g; };
+    api.agar.getWindowCenterCoord = function() {  // meow
+      return new math.Vector2D(s, t);
+    };
+
+    api.agar.getScale = function() {  // meow
+      return h;
+    };
+
+    api.agar.getWindowSize = function() {  // meow
+      return new math.Vector2D(p, m);
+    };
+
+    api.agar._updateCirclesInfo = function() {  // meow
+      api.agar._ourCirclesInfo = [];
+      api.agar._spikeCirclesInfo = [];
+      api.agar._otherCirclesInfo = [];
+      for (var i = 0; i < q.length; ++i) {
+        var circleInfo = new api.agar.CircleInfo(q[i]);
+        if (g.indexOf(q[i]) >= 0) {
+          api.agar._ourCirclesInfo.push(circleInfo);
+        } else if (q[i].isVirus) {
+          api.agar._spikeCirclesInfo.push(circleInfo);
+        } else {
+          api.agar._otherCirclesInfo.push(circleInfo);
+        }
+      }
+      api.agar._circlesInfoChanged = false;
+    };
 
     ga.src = "img/split.png";
     var xa = document.createElement("canvas");
@@ -1287,6 +1043,7 @@ api.originalInit = function() {
           }
         },
         updatePos: function() {
+          api.agar._circlesInfoChanged = true;  // meow
           var a;
           a = (E - this.updateTime) / 120;
           a = 0 > a ? 0 : 1 < a ? 1 : a;
@@ -1415,7 +1172,7 @@ api.originalInit = function() {
         }
       };
 
-      ya();  //! Go!!
+      ya();  // Go!!
     }
   }
 };

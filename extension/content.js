@@ -1,38 +1,61 @@
 var extension = extension || {};  //!< namespace extension
 
 
-//! @brief Event handler for window's onload event.
+/*!
+ * @function Event handler for window's onload event.
+ */
 extension.initFunc = function() {
-  api.init();
+  util.init();
+  math.init();
+  mark.init(util, math);
+  api.init(util, math, mark);
+  ai.init(util, math, mark, api);
 
-  api.registerKeyboardHandler(
-      'mM', function() { api.setIsUserOwnMove(!api.isUserOwnMove()); });
-  api.registerKeyboardHandler(
-      'aA', function() { api.setIsUserOwnAttack(!api.isUserOwnAttack()); });
-  api.registerKeyboardHandler(
-      'sS', function() { api.setIsUserOwnSplit(!api.isUserOwnSplit()); });
+  api.registerKeyboardHandler('aA', function() {
+    if (api.isUserMode()) {
+      api.switchToAIMode();
+    } else {
+      api.switchToUserMode();
+    }
+  });
+
+  api.setDrawingMode({direction : true,
+                      safeCircle : true,
+                      attackRange : false,
+                      opponentsAttackRange : false});
 
   api.setSelfName('AI');
   api.setRegion('JP-Tokyo');
 
-  ai.ededanxiaoguay.start();
+  ai.setAgent(new ai.EDeDanXiaoGuay());
+  ai.start();
 };
 
 
-//! @brief Extension's entry point.
+/*!
+ * @function Extension's entry point.
+ */
 extension.main = function() {
+  util.init();
+  module.init(util);
+
   var code = '';
-  code += util.dumpModules(new util.Module('util', util),
-                           new util.Module('api', api),
-                           new util.Module('ai', ai));
+  code += module.dumpModules(new module.Module('util', util),
+                             new module.Module('math', math),
+                             new module.Module('mark', mark),
+                             new module.Module('api', api),
+                             new module.Module('ai', ai));
   code += 'window.onload = ' + extension.initFunc.toString() + ';\n';
 
   extension._insertJS(code);
 };
 
 
-//! @brief Inserts a peace of javascript code tag.
-//! @param [in] code The code.
+/*!
+ * @function Inserts a peace of javascript code tag.
+ *
+ * @param [in] code The code.
+ */
 extension._insertJS = function(code) {
   if (typeof document == 'undefined') {
     console.log(code);
