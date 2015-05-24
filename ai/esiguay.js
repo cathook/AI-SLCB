@@ -1,27 +1,30 @@
 var ai = ai || {};  //!< namespace ai
 
-ai.esiguay = ai.esiguay || {};  //!< namespace ai.esiguay
 
+ai.ESiGuay = function() {
+  this._targetPoint = new api.MarkPoint(new api.Position(),
+                                        '#006600', api.MarkPoint.Type.TARGET);
+}
 
-//! Starts to use this agent.
-ai.esiguay.start = function() {
-  ai.esiguay._targetPoint = new api.MarkPoint(new api.Position(),
-                                              '#006600',
-                                              api.MarkPointType.TARGET);
-  ai.esiguay._runFlag = true;
-  api.addMark(ai.esiguay._targetPoint);
-  ai.esiguay._run();
+ai.ESiGuay.prototype.init = function() {
+  api.addMark(this._targetPoint);
 };
 
 
-//! Stops this agent.
-ai.esiguay.stop = function() {
-  ai.esiguay._runFlag = false;
-  api.removeMark(ai.esiguay._targetPoint);
-}
+ai.ESiGuay.prototype.cleanup = function() {
+  api.removeMark(this._targetPoint);
+};
 
+ai.ESiGuay.prototype.run = function() {
+  var agent = api.getSelf();
+  var foods = api.getFoods();
 
-ai.esiguay.getTargetPosition = function(agent, foods) {
+  var target = this.getTargetPosition(agent, foods);
+  this._targetPoint.position.copyFrom(target);
+  api.setTargetPosition(target);
+};
+
+ai.ESiGuay.prototype.getTargetPosition = function(agent, foods) {
   var ret;
   if (foods.length == 0) {
     ret = agent.circles[0].clone();
@@ -38,27 +41,3 @@ ai.esiguay.getTargetPosition = function(agent, foods) {
   };
   return ret;
 };
-
-
-//! run...
-ai.esiguay._run = function() {
-  var goNext = function() { window.setTimeout(ai.esiguay._run, 500); };
-  if (ai.esiguay._runFlag !== true) {
-    return;
-  }
-
-  var agent = api.getSelf();
-  if (agent.circles.length == 0) {
-    goNext();
-    return;
-  }
-
-  var dst = ai.esiguay.getTargetPosition(agent, api.getFoods());
-  api.setTargetPosition(dst);
-  ai.esiguay._targetPoint.position.copyFrom(dst);
-
-  goNext();
-};
-
-
-ai.esiguay._targetPoint = null;
