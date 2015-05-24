@@ -249,6 +249,27 @@ api.init = function(util, math, mark) {
 
 
   /*!
+   * @function Gets the window size.
+   *
+   * @return An instance of math.Vector2D, where `x` be the width and `y` be
+   *     the height.
+   */
+  api.getWindowSize = function() {
+    return api.agar.getWindowSize();
+  };
+
+
+  /*!
+   * @function Transforms the window coord to the world coordinate.
+   *
+   * @param [in] coord The window coordinate.
+   */
+  api.toWorldCoord = function(coord) {
+    return api.agar.toWorldCoord(coord);
+  };
+
+
+  /*!
    * @function Adds a mark to draw on the canvas.
    *
    * @param [in] m An instance of one of the Point, Circle, Arrow.
@@ -262,6 +283,22 @@ api.init = function(util, math, mark) {
    * @param [in] m An instance of one of the Point, Circle, Arrow.
    */
   api.removeMark = function(m) { api._marks.remove(m); };
+
+
+  /*!
+   * @function Adds a background mark to draw on the canvas.
+   *
+   * @param [in] m An instance of one of the Point, Circle, Arrow.
+   */
+  api.addBackgroundMark = function(m) { api._backgroundMarks.add(m); };
+
+
+  /*!
+   * @function Removes a background mark.
+   *
+   * @param [in] m An instance of one of the Point, Circle, Arrow.
+   */
+  api.removeBackgroundMark = function(m) { api._backgroundMarks.remove(m); };
 
 
   /*!
@@ -385,6 +422,16 @@ api.init = function(util, math, mark) {
     api._tryDrawAttackRange(canvas);
     api._tryDrawOpponentsAttackRange(canvas);
     api._marks.forEach(function(m) { m.draw(canvas); });
+  };
+
+
+  /*!
+   * @function Draws all the background marks.
+   *
+   * @param [in] canvas The canvas to draw on.
+   */
+  api._drawBackground = function(canvas) {
+    api._backgroundMarks.forEach(function(m) { m.draw(canvas); });
   };
 
 
@@ -524,7 +571,14 @@ api.init = function(util, math, mark) {
   api._marks = new util.Set();
 
 
+  /*!
+   * @var List of marks.
+   */
+  api._backgroundMarks = new util.Set();
+
+
   api.agar.addDrawFunc(api._draw);
+  api.agar.addDrawBeforeFunc(api._drawBackground);
 
   window.onkeydown = api._keydownHandler;
   window.onkeyup = api._keyupHandler;

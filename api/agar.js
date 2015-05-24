@@ -154,7 +154,7 @@ api.agar.init = function(util, math) {
    *     height of the world.
    */
   api.agar.getWorldSize = function() {
-    return new api.agar.Position(11180, 11180);
+    return new math.Vector2D(11180, 11180);
   };
 
 
@@ -196,6 +196,19 @@ api.agar.init = function(util, math) {
 
 
   /*!
+   * @function Transforms the gived window coordinate to the world coordinate.
+   *
+   * @param [in] coord The coordinate to be transformed.
+   */
+  api.agar.toWorldCoord = function(coord) {
+    var c = api.agar.getWindowCenterCoord();
+    var s = api.agar.getScale();
+    var w = api.agar.getWindowSize();
+    return coord.minus(w.div(2)).div(s).add(c);
+  };
+
+
+  /*!
    * @function Adds a function which will be called while rendering the canvas.
    *
    * @param [in] func The function with one argument, which is the canvas to draw
@@ -214,6 +227,28 @@ api.agar.init = function(util, math) {
    */
   api.agar.removeDrawFunc = function(func) {
     api.agar._drawFuncs.remove(func);
+  };
+
+
+  /*!
+   * @function Adds a function which will be called while rendering the canvas.
+   *
+   * @param [in] func The function with one argument, which is the canvas to draw
+   *     on.
+   */
+  api.agar.addDrawBeforeFunc = function(func) {
+    api.agar._drawBeforeFuncs.add(func);
+  };
+
+
+  /*!
+   * @function Removes a function which will be called while rendering the canvas.
+   *
+   * @param [in] func The function to be removed.
+   *     on.
+   */
+  api.agar.removeDrawBeforeFunc = function(func) {
+    api.agar._drawBeforeFuncs.remove(func);
   };
 
 
@@ -265,6 +300,16 @@ api.agar.init = function(util, math) {
    *
    * @param [in] canvas The canvas to draw on.
    */
+  api.agar._drawBefore = function(canvas) {
+    api.agar._drawBeforeFuncs.forEach(function(func) { func(canvas); });
+  };
+
+
+  /*!
+   * @function Calls all the drawing functions.
+   *
+   * @param [in] canvas The canvas to draw on.
+   */
   api.agar._draw = function(canvas) {
     api.agar._drawFuncs.forEach(function(func) { func(canvas); });
   };
@@ -304,6 +349,12 @@ api.agar.init = function(util, math) {
    * @var Caches other circles' information.
    */
   api.agar._otherCirclesInfo = [];
+
+
+  /*!
+   * @var A set of functions.
+   */
+  api.agar._drawBeforeFuncs = new util.Set();
 
 
   /*!
@@ -722,6 +773,9 @@ api.agar.init = function(util, math) {
     e.translate(p / 2, m / 2);
     e.scale(h, h);
     e.translate(-s, -t);
+
+    api.agar._drawBefore(e);  // meow
+
     for (d = 0; d < C.length; d++) C[d].draw();
     for (d = 0; d < q.length; d++) q[d].draw();
 
