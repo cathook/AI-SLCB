@@ -69,14 +69,32 @@ A Google Chrome extension for invincible AI on agar.io, a popular web-based game
 ## APIs for creating AI agent
 
 ```javascript
-function getSelf();  // Returns a list of fissions with absolute position and size.
-function getOpponents();  // Returns a list of positions and sizes of the opponents' fissions list within eyesight.
-function getFoods();  // Returns the list of food objects.
-function getSpikes();  // Returns the list of spike objects.
-function setTargetPosition();  // Sends the next position to the server.
-function setName();  // Sets the name of our agent.
-function attack();  // Attacks by throwing a little body.
-function split();  // Splits the body.
+// Sets the target position. pos: an instance of api.Position. useWindowCoord: optional, indicating whether pos is window coordinate or not.
+api.setTargetPosition = function(pos, useWindowCorrd);
+// Splits the agent.
+api.split = function();
+// Lets the agent attack by throwing a little circle.
+api.attack = function();
+// Gets our agent's information.
+api.getSelf = function();
+// Gets foods information. Returns a list of instances of api.CircleInfo.
+api.getFoods = function();
+// Gets spikes information. Returns a list of instances of api.CircleInfo.
+api.getSpikes = function();
+// Gets opponents information. Returns a list of api.Player.
+api.getOpponents = function();
+// Gets all information, including self, spikes, foods, opponents. Returns a dict.
+api.getAll = function();
+// Gets the map size. Returns the coordinate of the buttom-right corner.
+api.getWorldSize = function();
+// Gets the dangerous range. Returns the max distance the bad guy can boost if it splits.
+api.getDangerRadius = function();
+// Gets radius if splitted. Parameter "radius": current radius. Return a number.
+api.getSplittedRadius = function(radius);
+// Gets the window size. Returns an instance of math.Vector2D where x=width, y=height.
+api.getWindowSize = function();
+// Transforms the window coord to the world coordinate. coord: the window coordinate.
+api.toWorldCoord = function(coord);
 ```
 
 ## Potential strategies for our agent
