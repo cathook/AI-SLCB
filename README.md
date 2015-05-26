@@ -53,8 +53,8 @@ A Google Chrome extension for invincible AI on agar.io, a popular web-based game
 |:-----|:-------------|:------:|:---:|
 |sycLin|GONGJIGUAY|1|*on-going*|
 |lunaivory|ESIGUAY|1|*on-going*|
-|cathook|APIs + HENEDEDANXIAOGUAY|0 + 1|*on-going*|
-|benchou1919| | | |
+|cathook|APIs + EDEDANXIAOGUAY|0 + 1|*on-going*|
+|benchou1919|GONGJIGUAY|1|*on-going*|
 
 
 **Milestone #3**
@@ -85,9 +85,8 @@ function split();  // Splits the body.
 |:------------|:--|:----------|
 |ESIGUAY|L|eats as many pieces of food as possible.|
 |DANXIAOGUAY|?|tries to keep a certain distance against enemies bigger than self.|
-|HENEDEDANXIAOGUAY|C|a mixture of DANXIAOGUAY and ESIGUAY.|
+|EDEDANXIAOGUAY|C|a mixture of DANXIAOGUAY and ESIGUAY.|
 |GONGJIGUAY|S|tries to eliminate enemies within a certain range.|
-|ZHIZHANGGUAY|?|makes random moves.|
 
 ## Coding style
 * [Google JavaScript coding style guide](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml)
