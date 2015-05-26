@@ -102,8 +102,8 @@ api.init = function(util, math, mark) {
    */
   api.split = function() {
     if (!api._userMode) {
-      api.agar.keyDown(32);
-      window.setTimeout(function() { api.agar.keyUp(32); }, 100);
+      api.agar.keyDown({keyCode : 32});
+      window.setTimeout(function() { api.agar.keyUp({keyCode : 32}); }, 100);
     }
   };
 
@@ -113,8 +113,8 @@ api.init = function(util, math, mark) {
    */
   api.attack = function() {
     if (!api._userMode) {
-      api.agar.keyDown(87);
-      window.setTimeout(function() { api.agar.keyUp(87); }, 100);
+      api.agar.keyDown({keyCode : 87});
+      window.setTimeout(function() { api.agar.keyUp({keyCode : 87}); }, 100);
     }
   };
 
@@ -515,13 +515,18 @@ api.init = function(util, math, mark) {
       } else {
         v = v.normalize().times(api.agar.getDangerRadius());
       }
+      var u = v.toRight().normalize().times(r2);
       var marks = [];
       marks.push(new mark.Circle(circles[i].center, r2,
                                  '#AA0000', mark.LineStyle.DOTTED));
       marks.push(new mark.Circle(circles[i].center.add(v), r2,
                                  '#AA0000', mark.LineStyle.DOTTED));
-      marks.push(new mark.Arrow(circles[i].center, circles[i].center.add(v),
-                                '#AA0000', mark.LineStyle.DOTTED));
+      marks.push(new mark.Line(circles[i].center.add(u),
+                               circles[i].center.add(u).add(v),
+                               '#AA0000', mark.LineStyle.DOTTED));
+      marks.push(new mark.Line(circles[i].center.minus(u),
+                               circles[i].center.minus(u).add(v),
+                               '#AA0000', mark.LineStyle.DOTTED));
       for (var i = 0; i < marks.length; ++i) {
         marks[i].draw(canvas);
       }
