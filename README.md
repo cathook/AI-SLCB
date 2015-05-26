@@ -102,7 +102,7 @@ api.toWorldCoord = function(coord);
 |Strategy Name|Who|Description|
 |:------------|:--|:----------|
 |ESIGUAY|L|eats as many pieces of food as possible.|
-|DANXIAOGUAY|?|tries to keep a certain distance against enemies bigger than self.|
+|DANXIAOGUAY|B|tries to keep a certain distance against enemies bigger than self.|
 |EDEDANXIAOGUAY|C|a mixture of DANXIAOGUAY and ESIGUAY.|
 |GONGJIGUAY|S|tries to eliminate enemies within a certain range.|
 
