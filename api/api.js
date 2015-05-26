@@ -109,7 +109,7 @@ api.init = function(util, math, mark) {
 
 
   /*!
-   * @function Lets the agent attack by throwing an little circle.
+   * @function Lets the agent attack by throwing a little circle.
    */
   api.attack = function() {
     if (!api._userMode) {
@@ -136,7 +136,7 @@ api.init = function(util, math, mark) {
   /*!
    * @function Gets foods information.
    *
-   * @return A list of instance of api.CircleInfo.
+   * @return A list of instances of api.CircleInfo.
    */
   api.getFoods = function() {
     var minRadius = api._getMinRadius(api.agar.getOurCirclesInfo());
@@ -153,7 +153,7 @@ api.init = function(util, math, mark) {
   /*!
    * @function Gets spikes information.
    *
-   * @return A list of instance of api.CircleInfo.
+   * @return A list of instances of api.CircleInfo.
    */
   api.getSpikes = function() {
     return api.agar.getSpikeCirclesInfo();
@@ -221,7 +221,7 @@ api.init = function(util, math, mark) {
   /*!
    * @function Gets the map size.
    *
-   * @return The coordinate of the right-bottom corner.
+   * @return The coordinate of the bottom-right corner.
    */
   api.getWorldSize = function() { return api.agar.getWorldSize(); };
 
@@ -229,7 +229,7 @@ api.init = function(util, math, mark) {
   /*!
    * @function Gets the dangerous range.
    *
-   * @return The max distance can the bad guy boost if it splits.
+   * @return The max distance the bad guy can boost if it splits.
    */
   api.getDangerRadius = function() {
     return api.agar.getDangerRadius();
