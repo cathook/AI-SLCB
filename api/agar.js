@@ -372,196 +372,211 @@ api.agar.init = function(util, math) {
   //
   //////////////////////////////////////////////////////////
   f = window;
-  r = jQuery;
+  g = jQuery;
 
-  // Initialize function, it will setup the event handlers.
-  function ya() {
-    ia();
-    setInterval(ia, 18E4);
-    z = $ = document.getElementById("canvas");
-    e = z.getContext("2d");
-    z.onmousedown = function(a) {
-      if (ja) {
-        var b = a.clientX - (5 + p / 5 / 2),
-          c = a.clientY - (5 + p / 5 / 2);
-        if (Math.sqrt(b * b + c * c) <= p / 5 / 2) {
-          G();
-          A(17);
+  function Ha() {
+    fa = !0;
+    oa();
+    setInterval(oa, 18E4);
+    A = ga = document.getElementById("canvas");
+    e = A.getContext("2d");
+    A.onmousedown = function(a) {
+      if (pa) {
+        var b = a.clientX - (5 + q / 5 / 2),
+          c = a.clientY - (5 + q / 5 / 2);
+        if (Math.sqrt(b * b + c * c) <= q / 5 / 2) {
+          J();
+          B(17);
           return
         }
       }
-      O = a.clientX;
-      P = a.clientY;
-      aa();
-      G()
+      R = a.clientX;
+      S = a.clientY;
+      ha();
+      J()
     };
-    z.onmousemove = function(a) {
-      O = a.clientX;
-      P = a.clientY;
-      aa()
+    A.onmousemove = function(a) {
+      R = a.clientX;
+      S = a.clientY;
+      ha()
     };
-    z.onmouseup = function(a) {};
+    A.onmouseup = function(a) {};
+    /firefox/i.test(navigator.userAgent) ? document.addEventListener("DOMMouseScroll", qa, !1) : document.body.onmousewheel = qa;
     var a = !1,
       b = !1,
       c = !1;
     f.onkeydown = function(d) {
-      32 != d.keyCode || a || (G(), A(17), a = !0);
-      81 != d.keyCode || b || (A(18), b = !0);
-      87 != d.keyCode || c || (G(), A(21), c = !0);
-      27 == d.keyCode && r("#overlays").fadeIn(200)
+      32 != d.keyCode || a || (J(), B(17), a = !0);
+      81 != d.keyCode || b || (B(18), b = !0);
+      87 != d.keyCode || c || (J(), B(21), c = !0);
+      27 == d.keyCode && ra(!0)
     };
     f.onkeyup = function(d) {
       32 == d.keyCode && (a = !1);
       87 == d.keyCode && (c = !1);
-      81 == d.keyCode && b && (A(19), b = !1)
+      81 == d.keyCode && b && (B(19), b = !1)
     };
     f.onblur = function() {
-      A(19);
+      B(19);
       c = b = a = !1
     };
-    f.onresize = ka;
+    f.onresize = sa;
 
-    api.agar._replaceEventHandlers(f, z);  // meow
+    api.agar._replaceEventHandlers(f, A);  // meow
 
-    ka();
-    f.requestAnimationFrame ? f.requestAnimationFrame(la) : setInterval(ba, 1E3 / 60);
-    setInterval(G, 40);
-    ma(r("#region").val());
-    r("#overlays").show()
+    sa();
+    f.requestAnimationFrame ? f.requestAnimationFrame(ta) : setInterval(ia, 1E3 / 60);
+    setInterval(J, 40);
+    u && g("#region").val(u);
+    ua();
+    T(g("#region").val());
+    null == m && u && U();
+    g("#overlays").show()
   }
 
-  // Creates a QUAD tree, put all data into it.
-  // Called by `ba()`.
-  function za() {
-    if (.5 > h) H = null;
+  function qa(a) {
+    C *= Math.pow(.9, a.wheelDelta / -120 || a.detail || 0);
+    1 > C && (C = 1);
+    C > 4 / h && (C = 4 / h)
+  }
+
+  function Ia() {
+    if (.35 > h) K = null;
     else {
-      for (var a = Number.POSITIVE_INFINITY, b = Number.POSITIVE_INFINITY, c = Number.NEGATIVE_INFINITY, d = Number.NEGATIVE_INFINITY, e = 0, k = 0; k < q.length; k++) q[k].shouldRender() && (e = Math.max(q[k].size, e), a = Math.min(q[k].x, a), b = Math.min(q[k].y, b), c = Math.max(q[k].x, c), d = Math.max(q[k].y, d));
-      H = QUAD.init({
+      for (var a = Number.POSITIVE_INFINITY, b = Number.POSITIVE_INFINITY, c = Number.NEGATIVE_INFINITY, d = Number.NEGATIVE_INFINITY, e = 0, p = 0; p < n.length; p++) n[p].shouldRender() && (e = Math.max(n[p].size, e), a = Math.min(n[p].x, a), b = Math.min(n[p].y, b), c = Math.max(n[p].x, c), d = Math.max(n[p].y, d));
+      K = QUAD.init({
         minX: a - (e + 100),
         minY: b - (e + 100),
         maxX: c + (e + 100),
         maxY: d + (e + 100)
       });
-      for (k = 0; k < q.length; k++)
-        if (a = q[k], a.shouldRender())
-          for (b = 0; b < a.points.length; ++b) H.insert(a.points[b])
+      for (p = 0; p < n.length; p++)
+        if (a = n[p], a.shouldRender())
+          for (b = 0; b < a.points.length; ++b) K.insert(a.points[b])
     }
   }
 
-  // Transform the window coordinate (O, P) to the absolute coordinate (Q, R)
-  function aa() {
-    Q = (O - p / 2) / h + s;
-    R = (P - m / 2) / h + t
-  }
-
-  function ia() {
-    null == S && (S = {}, r("#region").children().each(function() {
-      var a = r(this),
-        b = a.val();
-      b && (S[b] = a.text())
-    }));
-    r.get("http://m.agar.io/info", function(a) {
-      var b = {},
-        c;
-      for (c in a.regions) {
-        var d =
-          c.split(":")[0];
-        b[d] = b[d] || 0;
-        b[d] += a.regions[c].numPlayers
-      }
-      for (c in b) r('#region option[value="' + c + '"]').text(S[c] + " (" + b[c] + " players)")
-    }, "json")
-  }
-
-  function na() {
-    r("#adsBottom").hide();
-    r("#overlays").hide()
-  }
-
-  function ma(a) {
-    a && a != I && (I = a, ca())
+  function ha() {
+    V = (R - q / 2) / h + s;
+    W = (S - r / 2) / h + t
   }
 
   function oa() {
-    console.log("Find " + I + J);
-    r.ajax("http://m.agar.io/", {
+    null == X && (X = {}, g("#region").children().each(function() {
+      var a = g(this),
+        b = a.val();
+      b && (X[b] = a.text())
+    }));
+    g.get("http://m.agar.io/info", function(a) {
+      var b = {},
+        c;
+      for (c in a.regions) {
+        var d = c.split(":")[0];
+        b[d] = b[d] || 0;
+        b[d] += a.regions[c].numPlayers
+      }
+      for (c in b) g('#region option[value="' + c + '"]').text(X[c] + " (" + b[c] + " players)")
+    }, "json")
+  }
+
+  function va() {
+    g("#adsBottom").hide();
+    g("#overlays").hide();
+    ua()
+  }
+
+  function T(a) {
+    a && a != u && (g("#region").val() != a && g("#region").val(a),
+      u = f.localStorage.location = a, g(".region-message").hide(), g(".region-message." + a).show(), g(".btn-needs-server").prop("disabled", !1), fa && U())
+  }
+
+  function ra(a) {
+    D = null;
+    g("#overlays").fadeIn(a ? 200 : 3E3);
+    a || g("#adsBottom").fadeIn(3E3)
+  }
+
+  function ua() {
+    g("#region").val() ? f.localStorage.location = g("#region").val() : f.localStorage.location && g("#region").val(f.localStorage.location);
+    g("#region").val() ? g("#locationKnown").append(g("#region")) : g("#locationUnknown").append(g("#region"))
+  }
+
+  function wa() {
+    console.log("Find " +
+      u + L);
+    g.ajax("http://m.agar.io/", {
       error: function() {
-        setTimeout(oa, 1E3)
+        setTimeout(wa, 1E3)
       },
       success: function(a) {
         a = a.split("\n");
-        pa("ws://" + a[0])
+        xa("ws://" + a[0])
       },
       dataType: "text",
       method: "POST",
       cache: !1,
       crossDomain: !0,
-      data: I + J || "?"
+      data: u + L || "?"
     })
   }
 
-  function ca() {
-    I && (r("#connecting").show(), oa())
+  function U() {
+    fa && u && (g("#connecting").show(), wa())
   }
 
-  // Connects to the websocket server.
-  // Called by `oa()`
-  function pa(a) {
-    if (l) {
-      l.onopen = null;
-      l.onmessage = null;
-      l.onclose = null;
+  function xa(a) {
+    if (m) {
+      m.onopen = null;
+      m.onmessage = null;
+      m.onclose = null;
       try {
-        l.close()
+        m.close()
       } catch (b) {}
-      l = null
+      m = null
     }
-    B = [];
-    g = [];
-    w = {};
-    q = [];
-    C = [];
-    y = [];
-    x = u = null;
-    D = 0;
+    E = [];
+    l = [];
+    y = {};
+    n = [];
+    F = [];
+    z = [];
+    v = w = null;
+    G = 0;
     console.log("Connecting to " + a);
-    l = new WebSocket(a);
-    l.binaryType = "arraybuffer";
-    l.onopen = Aa;
-    l.onmessage = Ba;
-    l.onclose = Ca;
-    l.onerror = function() {
+    m = new WebSocket(a);
+    m.binaryType = "arraybuffer";
+    m.onopen = Ja;
+    m.onmessage = Ka;
+    m.onclose = La;
+    m.onerror = function() {
       console.log("socket error")
     }
   }
 
-  // After the socket opened, do some initialize...
-  // It is the onopen event handler for the websocket.
-  function Aa(a) {
-    r("#connecting").hide();
+  function Ja(a) {
+    Y = 500;
+    g("#connecting").hide();
     console.log("socket open");
     a = new ArrayBuffer(5);
     var b = new DataView(a);
     b.setUint8(0, 254);
-    b.setUint32(1, 1, !0);
-    l.send(a);
+    b.setUint32(1, 4, !0);
+    m.send(a);
     a = new ArrayBuffer(5);
     b = new DataView(a);
     b.setUint8(0, 255);
     b.setUint32(1, 1, !0);
-    l.send(a);
-    qa()
+    m.send(a);
+    ya()
   }
 
-  // Shows some message right after the websocket is closed.
-  // It is the onclose event handler for the websocket.
-  function Ca(a) {
+  function La(a) {
     console.log("socket close");
-    setTimeout(ca, 500)
+    setTimeout(U, Y);
+    Y *= 1.5
   }
 
-  // Message handler for the websocket.
-  function Ba(a) {
+  function Ka(a) {
     function b() {
       for (var a = "";;) {
         var b = d.getUint16(c, !0);
@@ -575,250 +590,236 @@ api.agar.init = function(util, math) {
       d = new DataView(a.data);
     switch (d.getUint8(0)) {
       case 16:
-        Da(d);
+        Ma(d);
         break;
       case 17:
-        K = d.getFloat32(1, !0);
-        L = d.getFloat32(5, !0);
-        M = d.getFloat32(9, !0);
+        M = d.getFloat32(1, !0);
+        N = d.getFloat32(5, !0);
+        O = d.getFloat32(9, !0);
         break;
       case 20:
-        g = [];
-        B = [];
+        l = [];
+        E = [];
         break;
       case 32:
-        B.push(d.getUint32(1, !0));
+        E.push(d.getUint32(1, !0));
         break;
       case 49:
-        if (null != u) break;
+        if (null != w) break;
         a = d.getUint32(c, !0);
         c += 4;
-        y = [];
+        z = [];
         for (var e = 0; e < a; ++e) {
-          var k = d.getUint32(c, !0),
+          var p = d.getUint32(c, !0),
             c = c + 4;
-          y.push({
-            id: k,
+          z.push({
+            id: p,
             name: b()
           })
         }
-        ra();
+        za();
         break;
       case 50:
-        u = [];
+        w = [];
         a = d.getUint32(c, !0);
         c += 4;
-        for (e = 0; e < a; ++e) u.push(d.getFloat32(c, !0)), c += 4;
-        ra();
+        for (e = 0; e < a; ++e) w.push(d.getFloat32(c, !0)), c += 4;
+        za();
         break;
       case 64:
-        T = d.getFloat64(1, !0), U = d.getFloat64(9, !0), V = d.getFloat64(17, !0), W = d.getFloat64(25, !0), K = (V + T) / 2, L = (W + U) / 2, M = 1, 0 == g.length && (s = K, t = L, h = M)
+        Z = d.getFloat64(1, !0), $ = d.getFloat64(9, !0), aa = d.getFloat64(17, !0), ba = d.getFloat64(25, !0), M = (aa + Z) / 2, N = (ba + $) / 2, O = 1, 0 == l.length && (s = M, t = N, h = O)
     }
   }
 
-  // Sync the circles data.
-  function Da(a) {
+  function Ma(a) {
+    H = +new Date;
+
     api.agar._circlesInfoChanged = true;  // meow
 
-    E = +new Date;
     var b = Math.random(),
       c = 1;
-    da = !1;
-    // deletes some circle.
+    ja = !1;
     for (var d = a.getUint16(c, !0), c = c + 2, e = 0; e < d; ++e) {
-      var k = w[a.getUint32(c, !0)],
-        f = w[a.getUint32(c + 4, !0)],
+      var p = y[a.getUint32(c, !0)],
+        f = y[a.getUint32(c + 4, !0)],
         c = c + 8;
-      k && f &&
-        (f.destroy(), f.ox = f.x, f.oy = f.y, f.oSize = f.size, f.nx = k.x, f.ny = k.y, f.nSize = f.size, f.updateTime = E)
+      p && f && (f.destroy(), f.ox = f.x, f.oy = f.y, f.oSize = f.size, f.nx = p.x, f.ny = p.y, f.nSize = f.size, f.updateTime = H)
     }
-    // adds some circle.
-    for (;;) {
+    for (e = 0;;) {
       d = a.getUint32(c, !0);
       c += 4;
       if (0 == d) break;
-      for (var e = a.getFloat32(c, !0), c = c + 4, k = a.getFloat32(c, !0), c = c + 4, f = a.getFloat32(c, !0), c = c + 4, h = a.getUint8(c++), l = a.getUint8(c++), p = a.getUint8(c++), h = (h << 16 | l << 8 | p).toString(16); 6 > h.length;) h = "0" + h;
+      ++e;
+      var g, p = a.getInt16(c, !0),
+        c = c + 2,
+        f = a.getInt16(c, !0),
+        c = c + 2;
+      g = a.getInt16(c, !0);
+      for (var c = c + 2, h = a.getUint8(c++),
+          m = a.getUint8(c++), q = a.getUint8(c++), h = (h << 16 | m << 8 | q).toString(16); 6 > h.length;) h = "0" + h;
       var h = "#" + h,
-        m = a.getUint8(c++),
-        l = !!(m & 1),
-        p = !!(m & 16);
-      m & 2 && (c += 4);
-      m & 4 && (c += 8);
-      m & 8 && (c += 16);
-      for (m = "";;) {
-        var n = a.getUint16(c, !0),
-          c = c + 2;
+        k = a.getUint8(c++),
+        m = !!(k & 1),
+        q = !!(k & 16);
+      k & 2 && (c += 4);
+      k & 4 && (c += 8);
+      k & 8 && (c += 16);
+      for (var n, k = "";;) {
+        n = a.getUint16(c, !0);
+        c += 2;
         if (0 == n) break;
-        m += String.fromCharCode(n)
+        k += String.fromCharCode(n)
       }
-      n = null;
-      w.hasOwnProperty(d) ? (n = w[d], n.updatePos(), n.ox = n.x, n.oy = n.y, n.oSize = n.size, n.color = h) : (n = new sa(d, e, k, f, h, m), n.pX = e, n.pY = k);
-      n.isVirus = l;
-      n.isAgitated = p;
-      n.nx = e;
-      n.ny = k;
-      n.nSize = f;
-      n.updateCode = b;
-      n.updateTime = E;
-
-      // seems like a special case for entering the game...
-      if (B.indexOf(d) != -1 && g.indexOf(n) == -1) {
-        document.getElementById("overlays").style.display = "none";
-        g.push(n);
-        if (g.length == 1) {
-          s = n.x;
-          t = n.y;
-        }
-      }
+      n = k;
+      k = null;
+      y.hasOwnProperty(d) ? (k = y[d], k.updatePos(), k.ox = k.x, k.oy = k.y, k.oSize = k.size, k.color = h) : (k = new Aa(d, p, f, g, h, n), k.pX = p, k.pY = f);
+      k.isVirus = m;
+      k.isAgitated = q;
+      k.nx = p;
+      k.ny = f;
+      k.nSize = g;
+      k.updateCode = b;
+      k.updateTime = H; - 1 != E.indexOf(d) && -1 == l.indexOf(k) && (document.getElementById("overlays").style.display = "none", l.push(k), 1 == l.length && (s = k.x, t = k.y))
     }
-    // removes the old data.
-    a.getUint16(c, !0);
-    c += 2;
-    k = a.getUint32(c, !0);
+    b = a.getUint32(c, !0);
     c += 4;
-    for (e = 0; e < k; e++) d = a.getUint32(c, !0), c += 4, w[d] && (w[d].updateCode = b);
-    for (e = 0; e < q.length; e++) q[e].updateCode != b && q[e--].destroy();
-    da && 0 == g.length && r("#overlays").fadeIn(3E3)
+    for (e = 0; e < b; e++) d = a.getUint32(c, !0), c += 4, k = y[d], null != k && k.destroy();
+    ja && 0 == l.length && ra(!1)
   }
 
-  // Sends some information to the websocket server...
-  function G() {
-    if (ea()) {
-      var a = O - p / 2,
-        b = P - m / 2;
-      64 > a * a + b * b || ta == Q && ua == R || (ta = Q, ua = R, a = new ArrayBuffer(21), b = new DataView(a), b.setUint8(0, 16), b.setFloat64(1, Q, !0), b.setFloat64(9, R, !0), b.setUint32(17, 0, !0), l.send(a))
+  function J() {
+    if (ka()) {
+      var a = R - q / 2,
+        b = S - r / 2;
+      64 > a * a + b * b || Ba == V && Ca == W || (Ba = V, Ca = W, a = new ArrayBuffer(21), b = new DataView(a), b.setUint8(0, 16), b.setFloat64(1, V, !0), b.setFloat64(9, W, !0), b.setUint32(17, 0, !0), m.send(a))
     }
   }
 
-  // Sends the array `N` to the server.
-  function qa() {
-    if (ea() && null != N) {
-      var a = new ArrayBuffer(1 + 2 * N.length),
+  function ya() {
+    if (ka() && null != D) {
+      var a = new ArrayBuffer(1 + 2 * D.length),
         b = new DataView(a);
       b.setUint8(0, 0);
-      for (var c = 0; c < N.length; ++c) b.setUint16(1 + 2 * c, N.charCodeAt(c), !0);
-      l.send(a)
+      for (var c = 0; c < D.length; ++c) b.setUint16(1 + 2 * c, D.charCodeAt(c), !0);
+      m.send(a)
     }
   }
 
-  // Checks whether the websocket is opened or not.
-  function ea() {
-    return null != l && l.readyState == l.OPEN
+  function ka() {
+    return null != m && m.readyState == m.OPEN
   }
 
-  // Sents a 8-bit int to the server.
-  function A(a) {
-    if (ea()) {
+  function B(a) {
+    if (ka()) {
       var b = new ArrayBuffer(1);
       (new DataView(b)).setUint8(0, a);
-      l.send(b)
+      m.send(b)
     }
   }
 
-  // Drawing and drawing...
-  function la() {
-    ba();
-    f.requestAnimationFrame(la)
+  function ta() {
+    ia();
+    f.requestAnimationFrame(ta)
   }
 
-  //! Resize event handler.
-  function ka() {
-    p = f.innerWidth;
-    m = f.innerHeight;
-    $.width = z.width = p;
-    $.height = z.height = m;
-    ba()
+  function sa() {
+    q = f.innerWidth;
+    r = f.innerHeight;
+    ga.width = A.width = q;
+    ga.height = A.height = r;
+    ia()
   }
 
-  function Ea() {
-    if (0 != g.length) {
-      for (var a = 0, b = 0; b < g.length; b++) a += g[b].size;
-      a = Math.pow(Math.min(64 / a, 1), .4) * Math.max(m / 1080, p / 1920);
+  function Da() {
+    var a;
+    a = 1 * Math.max(r / 1080, q / 1920);
+    return a *= C
+  }
+
+  function Na() {
+    if (0 != l.length) {
+      for (var a = 0, b = 0; b < l.length; b++) a += l[b].size;
+      a = Math.pow(Math.min(64 / a, 1), .4) * Da();
       h = (9 * h + a) / 10
     }
   }
 
-  // Something likes re-draw and update...
-  function ba() {
-    var a = +new Date;
-    ++Fa;
-    E = +new Date;
-    if (0 < g.length) {
-      Ea();
-      for (var b = 0, c = 0, d = 0; d < g.length; d++) g[d].updatePos(), b += g[d].x / g.length, c += g[d].y / g.length;
-      K = b;
-      L = c;
-      M = h;
+  function ia() {
+    var a, b, c = +new Date;
+    ++Oa;
+    H = +new Date;
+    if (0 < l.length) {
+      Na();
+      for (var d = a = b = 0; d < l.length; d++) l[d].updatePos(), b += l[d].x / l.length, a += l[d].y / l.length;
+      M = b;
+      N = a;
+      O = h;
       s = (s + b) / 2;
-      t = (t + c) / 2
-    } else s = (29 * s + K) / 30, t = (29 * t + L) / 30, h = (9 * h + M) / 10;
-    za();
-    aa();
-    e.clearRect(0, 0, p, m);
-    e.fillStyle = fa ? "#111111" : "#F2FBFF";
-    e.fillRect(0, 0, p, m);
+      t = (t + a) / 2
+    } else s = (29 * s + M) / 30, t = (29 * t + N) / 30, h = (9 * h + O * Da()) / 10;
+    Ia();
+    ha();
+    e.clearRect(0, 0, q, r);
+    e.fillStyle = la ? "#111111" : "#F2FBFF";
+    e.fillRect(0, 0, q, r);
     e.save();
-    e.strokeStyle = fa ? "#AAAAAA" : "#000000";
+    e.strokeStyle = la ? "#AAAAAA" : "#000000";
     e.globalAlpha = .2;
     e.scale(h, h);
-    b = p / h;
-    c = m / h;
-    for (d = -.5 + (-s + b / 2) % 50; d < b; d += 50) e.beginPath(), e.moveTo(d, 0), e.lineTo(d, c), e.stroke();
-    for (d = -.5 + (-t + c / 2) % 50; d < c; d += 50) e.beginPath(), e.moveTo(0, d), e.lineTo(b, d), e.stroke();
+    b = q / h;
+    a = r / h;
+    for (d = -.5 + (-s + b / 2) % 50; d < b; d += 50) e.beginPath(),
+      e.moveTo(d, 0), e.lineTo(d, a), e.stroke();
+    for (d = -.5 + (-t + a / 2) % 50; d < a; d += 50) e.beginPath(), e.moveTo(0, d), e.lineTo(b, d), e.stroke();
     e.restore();
-    q.sort(function(a, b) {
+    n.sort(function(a, b) {
       return a.size == b.size ? a.id - b.id : a.size - b.size
     });
     e.save();
-    e.translate(p / 2, m / 2);
+    e.translate(q / 2, r / 2);
     e.scale(h, h);
     e.translate(-s, -t);
 
     api.agar._drawBefore(e);  // meow
 
-    for (d = 0; d < C.length; d++) C[d].draw();
-    for (d = 0; d < q.length; d++) q[d].draw();
+    for (d = 0; d < F.length; d++) F[d].draw();
+    for (d = 0; d < n.length; d++) n[d].draw();
 
     api.agar._draw(e);  // meow
 
     e.restore();
-    x && e.drawImage(x, p - x.width - 10, 10);
-    D = Math.max(D, Ga());
-    0 != D && (null == X && (X = new Y(24, "#FFFFFF")), X.setValue("Score: " + ~~(D / 100)), c = X.render(), b = c.width, e.globalAlpha = .2, e.fillStyle = "#000000", e.fillRect(10, m - 10 - 24 - 10, b + 10, 34), e.globalAlpha = 1, e.drawImage(c, 15, m - 10 - 24 - 5));
-    Ha();
-    a = +new Date - a;
-    a > 1E3 / 60 ? v -= .01 : a < 1E3 / 65 && (v += .01);.4 > v && (v = .4);
-    1 < v && (v = 1)
+    v && v.width && e.drawImage(v, q - v.width - 10, 10);
+    G = Math.max(G, Pa());
+    0 != G && (null == ca && (ca = new da(24, "#FFFFFF")), ca.setValue("Score: " + ~~(G / 100)), a = ca.render(), b = a.width, e.globalAlpha = .2, e.fillStyle = "#000000", e.fillRect(10, r - 10 - 24 - 10, b + 10, 34), e.globalAlpha = 1, e.drawImage(a, 15, r - 10 - 24 - 5));
+    Qa();
+    c = +new Date - c;
+    c > 1E3 / 60 ? x -= .01 : c < 1E3 / 65 && (x += .01);.4 > x && (x = .4);
+    1 < x && (x = 1)
   }
 
-  // Called by `ba()`
-  function Ha() {
-    if (ja && ga.width) {
-      var a = p / 5;
-      e.drawImage(ga, 5, 5, a, a)
+  function Qa() {
+    if (pa && ma.width) {
+      var a = q / 5;
+      e.drawImage(ma, 5, 5, a, a)
     }
   }
 
-  // Called by `ba()`, calculate the sum of areas of our circles.
-  function Ga() {
-    for (var a = 0, b = 0; b < g.length; b++) a += g[b].nSize * g[b].nSize;
+  function Pa() {
+    for (var a = 0, b = 0; b < l.length; b++) a += l[b].nSize * l[b].nSize;
     return a
   }
 
-  // Renders the leaderboard.
-  // Called by `Ba()`, seems that it will be called while the leaderboard
-  // changed.
-  function ra() {
-    x = null;
-    if (null != u || 0 != y.length)
-      if (null != u || Z) {
-        x = document.createElement("canvas");
-        var a = x.getContext("2d"),
+  function za() {
+    v = null;
+    if (null != w || 0 != z.length)
+      if (null != w || ea) {
+        v = document.createElement("canvas");
+        var a = v.getContext("2d"),
           b = 60,
-          b = null == u ? b + 24 * y.length : b + 180,
-          c = Math.min(200, .3 * p) / 200;
-        x.width = 200 * c;
-        x.height = b * c;
+          b = null == w ? b + 24 * z.length : b + 180,
+          c = Math.min(200, .3 * q) / 200;
+        v.width = 200 * c;
+        v.height = b * c;
         a.scale(c, c);
         a.globalAlpha = .4;
         a.fillStyle = "#000000";
@@ -828,18 +829,18 @@ api.agar.init = function(util, math) {
         c = null;
         c = "Leaderboard";
         a.font = "30px Ubuntu";
-        a.fillText(c, 100 - a.measureText(c).width /
-          2, 40);
-        if (null == u)
-          for (a.font = "20px Ubuntu", b = 0; b < y.length; ++b) c = y[b].name || "An unnamed cell", Z || (c = "An unnamed cell"), -1 != B.indexOf(y[b].id) ? (g[0].name && (c = g[0].name), a.fillStyle = "#FFAAAA") : a.fillStyle = "#FFFFFF", c = b + 1 + ". " + c, a.fillText(c, 100 - a.measureText(c).width / 2, 70 + 24 * b);
+        a.fillText(c, 100 - a.measureText(c).width / 2, 40);
+        if (null == w)
+          for (a.font = "20px Ubuntu", b = 0; b < z.length; ++b) c = z[b].name || "An unnamed cell", ea || (c = "An unnamed cell"), -1 != E.indexOf(z[b].id) ? (l[0].name && (c = l[0].name), a.fillStyle = "#FFAAAA") : a.fillStyle = "#FFFFFF", c = b + 1 + ". " + c, a.fillText(c, 100 - a.measureText(c).width /
+            2, 70 + 24 * b);
         else
-          for (b = c = 0; b < u.length; ++b) angEnd = c + u[b] * Math.PI * 2, a.fillStyle = Ia[b + 1], a.beginPath(), a.moveTo(100, 140), a.arc(100, 140, 80, c, angEnd, !1), a.fill(), c = angEnd
+          for (b = c = 0; b < w.length; ++b) angEnd = c + w[b] * Math.PI * 2, a.fillStyle = Ra[b + 1], a.beginPath(), a.moveTo(100, 140), a.arc(100, 140, 80, c, angEnd, !1), a.fill(), c = angEnd
       }
   }
 
-  function sa(a, b, c, d, e, f) {
-    q.push(this);
-    w[a] = this;
+  function Aa(a, b, c, d, e, f) {
+    n.push(this);
+    y[a] = this;
     this.id = a;
     this.ox = this.x = b;
     this.oy = this.y = c;
@@ -851,9 +852,7 @@ api.agar.init = function(util, math) {
     this.setName(f)
   }
 
-  // A class for text block.
-  // Use for "score", "name" of the agent...
-  function Y(a, b, c, d) {
+  function da(a, b, c, d) {
     a && (this._size = a);
     b && (this._color = b);
     this._stroke = !!c;
@@ -863,81 +862,84 @@ api.agar.init = function(util, math) {
   if ("agar.io" != f.location.hostname && "localhost" != f.location.hostname && "10.10.2.13" != f.location.hostname) f.location = "http://agar.io/";
   else if (f.top != f) f.top.location = "http://agar.io/";
   else {
-    // Known variables:
-    // p: canvas width
-    // m: canvas height
-    // O: window coordinate x
-    // P: window coordinate y
-    // Q: absolute coordinate x
-    // R: absoulte coordinate y
-    // H: the quad-tree
-    // $, z: canvas
-    // e: canvas.getContex('2d')
-    // g: a list stores our player's circles
-    // w: a dict stores circles
-    // q: a list stores circles
-    // C: for garbage (the one who is destroyed...)
-    // y: members in the leader board.
-    var $, e, z, p, m, H = null,
-      l = null,
+    var ga, e, A, q, r, K = null,
+      m = null,
       s = 0,
       t = 0,
-      B = [],
-      g = [],
-      w = {},
-      q = [],
-      C = [],
-      y = [],
-      O = 0,
-      P = 0,
-      Q = -1,
-      R = -1,
-      Fa = 0,
-      E = 0,
-      N = null,
-      T = 0,
-      U = 0,
-      V = 1E4,
-      W = 1E4,
+      E = [],
+      l = [],
+      y = {},
+      n = [],
+      F = [],
+      z = [],
+      R = 0,
+      S = 0,
+      V = -1,
+      W = -1,
+      Oa = 0,
+      H = 0,
+      D = null,
+      Z = 0,
+      $ = 0,
+      aa = 1E4,
+      ba = 1E4,
       h = 1,
-      I = null,
-      va = !0,
-      Z = !0,
-      ha = !1,
-      da = !1,
-      D = 0,
-      fa = !1,
-      wa = !1,
-      K = s = ~~((T + V) / 2),
-      L = t = ~~((U + W) / 2),
-      M = 1,
-      J = "",
       u = null,
-      Ia = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
-      ja = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      ga = new Image;
+      Ea = !0,
+      ea = !0,
+      na = !1,
+      ja = !1,
+      G = 0,
+      la = !1,
+      Fa = !1,
+      M = s = ~~((Z + aa) / 2),
+      N = t = ~~(($ + ba) / 2),
+      O = 1,
+      L = "",
+      w = null,
+      fa = !1,
+      P = 0,
+      Ra = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
+      C = 1,
+      pa = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      ma = new Image;
+    ma.src = "img/split.png";
+    P = document.createElement("canvas");
 
     api.agar.getWindowCenterCoord = function() {  // meow
+      // please search some line like:
+      // [a-zA-Z] = ([a-zA-Z] - [a-zA-Z] \/ 2) \/ [a-zA-Z] + [a-zA-Z]
       return new math.Vector2D(s, t);
     };
 
     api.agar.getScale = function() {  // meow
+      // please search some line like:
+      // [a-zA-Z] = ([a-zA-Z] - [a-zA-Z] \/ 2) \/ [a-zA-Z] + [a-zA-Z]
       return h;
     };
 
     api.agar.getWindowSize = function() {  // meow
-      return new math.Vector2D(p, m);
+      // please search some line like:
+      // [a-zA-Z] = ([a-zA-Z] - [a-zA-Z] \/ 2) \/ [a-zA-Z] + [a-zA-Z]
+      return new math.Vector2D(q, r);
     };
 
     api.agar._updateCirclesInfo = function() {  // meow
+      // please search some line like:
+      // for ([a-zA-Z] = 0; [a-zA-Z] < [a-zA-Z]\.length; [a-zA-Z]++) [a-zA-Z]\[[a-zA-Z]\]\.draw();
+      // for (var [a-zA-Z] = 0, [a-zA-Z] = 0; [a-zA-Z] < [a-zA-Z]\.length; [a-zA-Z]++) [a-zA-Z] += [a-zA-Z]\[[a-zA-Z]\]\.size;
+      // destroy: function
+      // case: 20
+      // prototype -> class name
+      var all = n, our = l;
       api.agar._ourCirclesInfo = [];
       api.agar._spikeCirclesInfo = [];
       api.agar._otherCirclesInfo = [];
-      for (var i = 0; i < q.length; ++i) {
-        var circleInfo = new api.agar.CircleInfo(q[i]);
-        if (g.indexOf(q[i]) >= 0) {
+      for (var i = 0; i < all.length; ++i) {
+        var circleInfo = new api.agar.CircleInfo(all[i]);
+        if (our.indexOf(all[i]) >= 0) {
           api.agar._ourCirclesInfo.push(circleInfo);
-        } else if (q[i].isVirus) {
+        } else if (all[i].isVirus) {
           api.agar._spikeCirclesInfo.push(circleInfo);
         } else {
           api.agar._otherCirclesInfo.push(circleInfo);
@@ -946,50 +948,363 @@ api.agar.init = function(util, math) {
       api.agar._circlesInfoChanged = false;
     };
 
-    ga.src = "img/split.png";
-    var xa = document.createElement("canvas");
-    if ("undefined" == typeof console || "undefined" == typeof DataView || "undefined" == typeof WebSocket || null == xa || null == xa.getContext) alert("You browser does not support this game, we recommend you to use Firefox to play this");
+    if ("undefined" == typeof console || "undefined" == typeof DataView || "undefined" == typeof WebSocket || null == P || null == P.getContext || null == f.localStorage) alert("You browser does not support this game, we recommend you to use Firefox to play this");
     else {
-      var S = null;
+      var X = null;
       f.setNick = function(a) {
-        na();
-        N = a;
-        qa();
-        D = 0
+        va();
+        D = a;
+        ya();
+        G = 0
       };
-      f.setRegion = ma;
+      f.setRegion = T;
       f.setSkins = function(a) {
-        va = a
+        Ea = a
       };
       f.setNames = function(a) {
-        Z = a
+        ea = a
       };
       f.setDarkTheme = function(a) {
-        fa = a
+        la = a
       };
       f.setColors = function(a) {
-        ha = a
+        na = a
       };
       f.setShowMass = function(a) {
-        wa = a
+        Fa = a
       };
       f.spectate = function() {
-        A(1);
-        na()
+        D = null;
+        B(1);
+        va()
       };
       f.setGameMode = function(a) {
-        a != J && (J = a, ca())
+        a != L && (L = a, U())
       };
-      f.connect = pa;
-      var ta = -1,
-        ua = -1,
-        x = null,
-        v = 1,
-        X = null,
-        F = {},
-        Ja = "poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;nazi;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;isis;doge;nasa;byzantium;imperial japan;french kingdom;somalia;turkey;mars;pokerface".split(";"),
-        Ka = ["m'blob"];
-      sa.prototype = {
+      null != f.localStorage && (null == f.localStorage.AB8 && (f.localStorage.AB8 = 0 + ~~(100 * Math.random())), P = +f.localStorage.AB8, f.ABGroup = P);
+      g.get("http://gc.agar.io", function(a) {
+        var b = a.split(" ");
+        a = b[0];
+        b = b[1] || ""; - 1 == "DE IL PL HU BR AT".split(" ").indexOf(a) && Ga.push("nazi");
+        Q.hasOwnProperty(a) && ("string" == typeof Q[a] ? u || T(Q[a]) : Q[a].hasOwnProperty(b) && (u || T(Q[a][b])))
+      }, "text");
+      setTimeout(function() {}, 3E5);
+      var Q = {
+        AF: "JP-Tokyo",
+        AX: "EU-London",
+        AL: "EU-London",
+        DZ: "EU-London",
+        AS: "SG-Singapore",
+        AD: "EU-London",
+        AO: "EU-London",
+        AI: "US-Atlanta",
+        AG: "US-Atlanta",
+        AR: "BR-Brazil",
+        AM: "JP-Tokyo",
+        AW: "US-Atlanta",
+        AU: "SG-Singapore",
+        AT: "EU-London",
+        AZ: "JP-Tokyo",
+        BS: "US-Atlanta",
+        BH: "JP-Tokyo",
+        BD: "JP-Tokyo",
+        BB: "US-Atlanta",
+        BY: "EU-London",
+        BE: "EU-London",
+        BZ: "US-Atlanta",
+        BJ: "EU-London",
+        BM: "US-Atlanta",
+        BT: "JP-Tokyo",
+        BO: "BR-Brazil",
+        BQ: "US-Atlanta",
+        BA: "EU-London",
+        BW: "EU-London",
+        BR: "BR-Brazil",
+        IO: "JP-Tokyo",
+        VG: "US-Atlanta",
+        BN: "JP-Tokyo",
+        BG: "EU-London",
+        BF: "EU-London",
+        BI: "EU-London",
+        KH: "JP-Tokyo",
+        CM: "EU-London",
+        CA: "US-Atlanta",
+        CV: "EU-London",
+        KY: "US-Atlanta",
+        CF: "EU-London",
+        TD: "EU-London",
+        CL: "BR-Brazil",
+        CN: "CN-China",
+        CX: "JP-Tokyo",
+        CC: "JP-Tokyo",
+        CO: "BR-Brazil",
+        KM: "EU-London",
+        CD: "EU-London",
+        CG: "EU-London",
+        CK: "SG-Singapore",
+        CR: "US-Atlanta",
+        CI: "EU-London",
+        HR: "EU-London",
+        CU: "US-Atlanta",
+        CW: "US-Atlanta",
+        CY: "JP-Tokyo",
+        CZ: "EU-London",
+        DK: "EU-London",
+        DJ: "EU-London",
+        DM: "US-Atlanta",
+        DO: "US-Atlanta",
+        EC: "BR-Brazil",
+        EG: "EU-London",
+        SV: "US-Atlanta",
+        GQ: "EU-London",
+        ER: "EU-London",
+        EE: "EU-London",
+        ET: "EU-London",
+        FO: "EU-London",
+        FK: "BR-Brazil",
+        FJ: "SG-Singapore",
+        FI: "EU-London",
+        FR: "EU-London",
+        GF: "BR-Brazil",
+        PF: "SG-Singapore",
+        GA: "EU-London",
+        GM: "EU-London",
+        GE: "JP-Tokyo",
+        DE: "EU-London",
+        GH: "EU-London",
+        GI: "EU-London",
+        GR: "EU-London",
+        GL: "US-Atlanta",
+        GD: "US-Atlanta",
+        GP: "US-Atlanta",
+        GU: "SG-Singapore",
+        GT: "US-Atlanta",
+        GG: "EU-London",
+        GN: "EU-London",
+        GW: "EU-London",
+        GY: "BR-Brazil",
+        HT: "US-Atlanta",
+        VA: "EU-London",
+        HN: "US-Atlanta",
+        HK: "JP-Tokyo",
+        HU: "EU-London",
+        IS: "EU-London",
+        IN: "JP-Tokyo",
+        ID: "JP-Tokyo",
+        IR: "JP-Tokyo",
+        IQ: "JP-Tokyo",
+        IE: "EU-London",
+        IM: "EU-London",
+        IL: "JP-Tokyo",
+        IT: "EU-London",
+        JM: "US-Atlanta",
+        JP: "JP-Tokyo",
+        JE: "EU-London",
+        JO: "JP-Tokyo",
+        KZ: "JP-Tokyo",
+        KE: "EU-London",
+        KI: "SG-Singapore",
+        KP: "JP-Tokyo",
+        KR: "JP-Tokyo",
+        KW: "JP-Tokyo",
+        KG: "JP-Tokyo",
+        LA: "JP-Tokyo",
+        LV: "EU-London",
+        LB: "JP-Tokyo",
+        LS: "EU-London",
+        LR: "EU-London",
+        LY: "EU-London",
+        LI: "EU-London",
+        LT: "EU-London",
+        LU: "EU-London",
+        MO: "JP-Tokyo",
+        MK: "EU-London",
+        MG: "EU-London",
+        MW: "EU-London",
+        MY: "JP-Tokyo",
+        MV: "JP-Tokyo",
+        ML: "EU-London",
+        MT: "EU-London",
+        MH: "SG-Singapore",
+        MQ: "US-Atlanta",
+        MR: "EU-London",
+        MU: "EU-London",
+        YT: "EU-London",
+        MX: "US-Atlanta",
+        FM: "SG-Singapore",
+        MD: "EU-London",
+        MC: "EU-London",
+        MN: "JP-Tokyo",
+        ME: "EU-London",
+        MS: "US-Atlanta",
+        MA: "EU-London",
+        MZ: "EU-London",
+        MM: "JP-Tokyo",
+        NA: "EU-London",
+        NR: "SG-Singapore",
+        NP: "JP-Tokyo",
+        NL: "EU-London",
+        NC: "SG-Singapore",
+        NZ: "SG-Singapore",
+        NI: "US-Atlanta",
+        NE: "EU-London",
+        NG: "EU-London",
+        NU: "SG-Singapore",
+        NF: "SG-Singapore",
+        MP: "SG-Singapore",
+        NO: "EU-London",
+        OM: "JP-Tokyo",
+        PK: "JP-Tokyo",
+        PW: "SG-Singapore",
+        PS: "JP-Tokyo",
+        PA: "US-Atlanta",
+        PG: "SG-Singapore",
+        PY: "BR-Brazil",
+        PE: "BR-Brazil",
+        PH: "JP-Tokyo",
+        PN: "SG-Singapore",
+        PL: "EU-London",
+        PT: "EU-London",
+        PR: "US-Atlanta",
+        QA: "JP-Tokyo",
+        RE: "EU-London",
+        RO: "EU-London",
+        RU: "RU-Russia",
+        RW: "EU-London",
+        BL: "US-Atlanta",
+        SH: "EU-London",
+        KN: "US-Atlanta",
+        LC: "US-Atlanta",
+        MF: "US-Atlanta",
+        PM: "US-Atlanta",
+        VC: "US-Atlanta",
+        WS: "SG-Singapore",
+        SM: "EU-London",
+        ST: "EU-London",
+        SA: "EU-London",
+        SN: "EU-London",
+        RS: "EU-London",
+        SC: "EU-London",
+        SL: "EU-London",
+        SG: "JP-Tokyo",
+        SX: "US-Atlanta",
+        SK: "EU-London",
+        SI: "EU-London",
+        SB: "SG-Singapore",
+        SO: "EU-London",
+        ZA: "EU-London",
+        SS: "EU-London",
+        ES: "EU-London",
+        LK: "JP-Tokyo",
+        SD: "EU-London",
+        SR: "BR-Brazil",
+        SJ: "EU-London",
+        SZ: "EU-London",
+        SE: "EU-London",
+        CH: "EU-London",
+        SY: "EU-London",
+        TW: "JP-Tokyo",
+        TJ: "JP-Tokyo",
+        TZ: "EU-London",
+        TH: "JP-Tokyo",
+        TL: "JP-Tokyo",
+        TG: "EU-London",
+        TK: "SG-Singapore",
+        TO: "SG-Singapore",
+        TT: "US-Atlanta",
+        TN: "EU-London",
+        TR: "TK-Turkey",
+        TM: "JP-Tokyo",
+        TC: "US-Atlanta",
+        TV: "SG-Singapore",
+        UG: "EU-London",
+        UA: "EU-London",
+        AE: "EU-London",
+        GB: "EU-London",
+        US: {
+          AL: "US-Atlanta",
+          AK: "US-Fremont",
+          AZ: "US-Fremont",
+          AR: "US-Atlanta",
+          CA: "US-Fremont",
+          CO: "US-Fremont",
+          CT: "US-Atlanta",
+          DE: "US-Atlanta",
+          FL: "US-Atlanta",
+          GA: "US-Atlanta",
+          HI: "US-Fremont",
+          ID: "US-Fremont",
+          IL: "US-Atlanta",
+          IN: "US-Atlanta",
+          IA: "US-Atlanta",
+          KS: "US-Atlanta",
+          KY: "US-Atlanta",
+          LA: "US-Atlanta",
+          ME: "US-Atlanta",
+          MD: "US-Atlanta",
+          MA: "US-Atlanta",
+          MI: "US-Atlanta",
+          MN: "US-Fremont",
+          MS: "US-Atlanta",
+          MO: "US-Atlanta",
+          MT: "US-Fremont",
+          NE: "US-Fremont",
+          NV: "US-Fremont",
+          NH: "US-Atlanta",
+          NJ: "US-Atlanta",
+          NM: "US-Fremont",
+          NY: "US-Atlanta",
+          NC: "US-Atlanta",
+          ND: "US-Fremont",
+          OH: "US-Atlanta",
+          OK: "US-Atlanta",
+          OR: "US-Fremont",
+          PA: "US-Atlanta",
+          RI: "US-Atlanta",
+          SC: "US-Atlanta",
+          SD: "US-Fremont",
+          TN: "US-Atlanta",
+          TX: "US-Atlanta",
+          UT: "US-Fremont",
+          VT: "US-Atlanta",
+          VA: "US-Atlanta",
+          WA: "US-Fremont",
+          WV: "US-Atlanta",
+          WI: "US-Atlanta",
+          WY: "US-Fremont",
+          DC: "US-Atlanta",
+          AS: "US-Atlanta",
+          GU: "US-Atlanta",
+          MP: "US-Atlanta",
+          PR: "US-Atlanta",
+          UM: "US-Atlanta",
+          VI: "US-Atlanta"
+        },
+        UM: "SG-Singapore",
+        VI: "US-Atlanta",
+        UY: "BR-Brazil",
+        UZ: "JP-Tokyo",
+        VU: "SG-Singapore",
+        VE: "BR-Brazil",
+        VN: "JP-Tokyo",
+        WF: "SG-Singapore",
+        EH: "EU-London",
+        YE: "JP-Tokyo",
+        ZM: "EU-London",
+        ZW: "EU-London"
+      };
+      f.connect = xa;
+      var Y = 500,
+        Ba = -1,
+        Ca = -1,
+        v = null,
+        x = 1,
+        ca = null,
+        I = {},
+        Ga = "poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;doge;nasa;byzantium;imperial japan;french kingdom;somalia;turkey;mars;pokerface;8;irs;receita federal".split(";"),
+        Sa = ["8", "nasa"],
+        Ta = ["m'blob"];
+      Aa.prototype = {
         id: 0,
         points: null,
         pointsAcc: null,
@@ -1014,22 +1329,22 @@ api.agar.init = function(util, math) {
         wasSimpleDrawing: !0,
         destroy: function() {
           var a;
-          for (a = 0; a < q.length; a++)
-            if (q[a] == this) {
-              q.splice(a, 1);
+          for (a = 0; a < n.length; a++)
+            if (n[a] == this) {
+              n.splice(a, 1);
               break
             }
-          delete w[this.id];
-          a = g.indexOf(this); - 1 != a && (da = !0, g.splice(a, 1));
-          a = B.indexOf(this.id); - 1 != a && B.splice(a, 1);
+          delete y[this.id];
+          a = l.indexOf(this); - 1 != a && (ja = !0, l.splice(a, 1));
+          a = E.indexOf(this.id); - 1 != a && E.splice(a, 1);
           this.destroyed = !0;
-          C.push(this)
+          F.push(this)
         },
         getNameSize: function() {
           return Math.max(~~(.3 * this.size), 24)
         },
         setName: function(a) {
-          if (this.name = a) null == this.nameCache ? this.nameCache = new Y(this.getNameSize(), "#FFFFFF", !0, "#000000") : this.nameCache.setSize(this.getNameSize()), this.nameCache.setValue(this.name)
+          if (this.name = a) null == this.nameCache ? this.nameCache = new da(this.getNameSize(), "#FFFFFF", !0, "#000000") : this.nameCache.setSize(this.getNameSize()), this.nameCache.setValue(this.name)
         },
         createPoints: function() {
           for (var a = this.getNumPoints(); this.points.length > a;) {
@@ -1059,7 +1374,7 @@ api.agar.init = function(util, math) {
           var a = 10;
           20 > this.size && (a = 5);
           this.isVirus && (a = 30);
-          return ~~Math.max(this.size * h * (this.isVirus ? Math.min(2 * v, 1) : v), a)
+          return ~~Math.max(this.size * h * (this.isVirus ? Math.min(2 * x, 1) : x), a)
         },
         movePoints: function() {
           this.createPoints();
@@ -1075,14 +1390,14 @@ api.agar.init = function(util, math) {
             var g = a[d].v,
               e = a[(d - 1 + c) % c].v,
               f = a[(d + 1) % c].v;
-            if (15 < this.size && null != H) {
+            if (15 < this.size && null != K) {
               var l = !1,
                 m = a[d].x,
-                p = a[d].y;
-              H.retrieve2(m - 5, p - 5, 10, 10, function(a) {
-                a.c != h && 25 > (m - a.x) * (m - a.x) + (p - a.y) * (p - a.y) && (l = !0)
+                n = a[d].y;
+              K.retrieve2(m - 5, n - 5, 10, 10, function(a) {
+                a.c != h && 25 > (m - a.x) * (m - a.x) + (n - a.y) * (n - a.y) && (l = !0)
               });
-              !l && (a[d].x < T || a[d].y < U || a[d].x > V || a[d].y > W) && (l = !0);
+              !l && (a[d].x < Z || a[d].y < $ || a[d].x > aa || a[d].y > ba) && (l = !0);
               l && (0 < b[d] && (b[d] = 0), b[d] -= 1)
             }
             g += b[d];
@@ -1099,36 +1414,36 @@ api.agar.init = function(util, math) {
         updatePos: function() {
           api.agar._circlesInfoChanged = true;  // meow
           var a;
-          a = (E - this.updateTime) / 120;
+          a = (H - this.updateTime) / 120;
           a = 0 > a ? 0 : 1 < a ? 1 : a;
-          a = a * a * (3 - 2 * a);
+          var b = 0 > a ? 0 : 1 < a ? 1 : a;
           this.getNameSize();
-          if (this.destroyed && 1 <= a) {
-            var b = C.indexOf(this); - 1 != b && C.splice(b, 1)
+          if (this.destroyed && 1 <= b) {
+            var c = F.indexOf(this); - 1 != c && F.splice(c, 1)
           }
           this.x = a * (this.nx - this.ox) + this.ox;
           this.y = a * (this.ny - this.oy) + this.oy;
-          this.size = a * (this.nSize - this.oSize) + this.oSize;
-          return a
+          this.size = b * (this.nSize - this.oSize) + this.oSize;
+          return b
         },
         shouldRender: function() {
-          return this.x + this.size + 40 < s - p / 2 / h || this.y + this.size + 40 < t - m / 2 / h || this.x - this.size - 40 > s + p /
-            2 / h || this.y - this.size - 40 > t + m / 2 / h ? !1 : !0
+          return this.x + this.size + 40 < s - q / 2 / h || this.y + this.size + 40 < t - r / 2 / h || this.x - this.size - 40 >
+            s + q / 2 / h || this.y - this.size - 40 > t + r / 2 / h ? !1 : !0
         },
         draw: function() {
           if (this.shouldRender()) {
-            var a = !this.isVirus && !this.isAgitated && .5 > h;
+            var a = !this.isVirus && !this.isAgitated && .35 > h;
             if (this.wasSimpleDrawing && !a)
               for (var b = 0; b < this.points.length; b++) this.points[b].v = this.size;
             this.wasSimpleDrawing = a;
             e.save();
-            this.drawTime = E;
+            this.drawTime = H;
             b = this.updatePos();
             this.destroyed && (e.globalAlpha *= 1 - b);
             e.lineWidth = 10;
             e.lineCap = "round";
             e.lineJoin = this.isVirus ? "mitter" : "round";
-            ha ? (e.fillStyle = "#FFFFFF", e.strokeStyle = "#AAAAAA") : (e.fillStyle = this.color, e.strokeStyle = this.color);
+            na ? (e.fillStyle = "#FFFFFF", e.strokeStyle = "#AAAAAA") : (e.fillStyle = this.color, e.strokeStyle = this.color);
             if (a) e.beginPath(), e.arc(this.x, this.y, this.size, 0, 2 * Math.PI, !1);
             else {
               this.movePoints();
@@ -1141,36 +1456,35 @@ api.agar.init = function(util, math) {
               }
             }
             e.closePath();
-            b = this.name.toLowerCase();
-            !this.isAgitated && va && "" == J ? -1 != Ja.indexOf(b) ? (F.hasOwnProperty(b) || (F[b] = new Image, F[b].src = "skins/" + b + ".png"), c = 0 != F[b].width && F[b].complete ? F[b] : null) : c = null : c = null;
-            b = c ? -1 != Ka.indexOf(b) : !1;
+            c = this.name.toLowerCase();
+            !this.isAgitated && Ea && "" == L ? -1 != Ga.indexOf(c) ? (I.hasOwnProperty(c) || (I[c] = new Image, I[c].src = "skins/" + c + ".png"), b = 0 != I[c].width && I[c].complete ? I[c] : null) : b = null : b = null;
+            b = (d = b) ? -1 != Ta.indexOf(c) : !1;
             a || e.stroke();
             e.fill();
-            null == c || b || (e.save(), e.clip(), e.drawImage(c, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size), e.restore());
-            (ha || 15 < this.size) && !a && (e.strokeStyle = "#000000", e.globalAlpha *= .1, e.stroke());
+            null == d || b || (e.save(), e.clip(), e.drawImage(d, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size), e.restore());
+            (na || 15 < this.size) && !a && (e.strokeStyle = "#000000", e.globalAlpha *= .1, e.stroke());
             e.globalAlpha = 1;
-            null != c && b && e.drawImage(c, this.x - 2 * this.size, this.y - 2 * this.size, 4 * this.size, 4 * this.size);
-            c = -1 != g.indexOf(this);
+            null != d && b && e.drawImage(d, this.x - 2 * this.size, this.y - 2 * this.size, 4 * this.size, 4 * this.size);
+            b = -1 != l.indexOf(this);
             a = ~~this.y;
-            if ((Z || c) && this.name && this.nameCache) {
+            if ((ea || b) && this.name && this.nameCache && (null == d || -1 == Sa.indexOf(c))) {
               d = this.nameCache;
               d.setValue(this.name);
               d.setSize(this.getNameSize());
-              b = Math.ceil(10 * h) / 10;
-              d.setScale(b);
+              c = Math.ceil(10 * h) / 10;
+              d.setScale(c);
               var d = d.render(),
-                f = ~~(d.width / b),
-                k = ~~(d.height /
-                  b);
-              e.drawImage(d, ~~this.x - ~~(f / 2), a - ~~(k / 2), f, k);
-              a += d.height / 2 / b + 4
+                f = ~~(d.width / c),
+                g = ~~(d.height / c);
+              e.drawImage(d, ~~this.x - ~~(f / 2), a - ~~(g / 2), f, g);
+              a += d.height / 2 / c + 4
             }
-            wa && (c || 0 == g.length && (!this.isVirus || this.isAgitated) && 20 < this.size) && (null == this.sizeCache && (this.sizeCache = new Y(this.getNameSize() / 2, "#FFFFFF", !0, "#000000")), c = this.sizeCache, c.setSize(this.getNameSize() / 2), c.setValue(~~(this.size * this.size / 100)), b = Math.ceil(10 * h) / 10, c.setScale(b), d = c.render(), f = ~~(d.width / b), k = ~~(d.height / b), e.drawImage(d, ~~this.x - ~~(f / 2), a - ~~(k / 2), f, k));
+            Fa && (b || 0 == l.length && (!this.isVirus || this.isAgitated) && 20 < this.size) && (null == this.sizeCache && (this.sizeCache = new da(this.getNameSize() / 2, "#FFFFFF", !0, "#000000")), b = this.sizeCache, b.setSize(this.getNameSize() / 2), b.setValue(~~(this.size * this.size / 100)), c = Math.ceil(10 * h) / 10, b.setScale(c), d = b.render(), f = ~~(d.width / c), g = ~~(d.height / c), e.drawImage(d, ~~this.x - ~~(f / 2), a - ~~(g / 2), f, g));
             e.restore()
           }
         }
       };
-      Y.prototype = {
+      da.prototype = {
         _value: "",
         _color: "#000000",
         _stroke: !1,
@@ -1209,24 +1523,41 @@ api.agar.init = function(util, math) {
               e = this._size,
               f = e + "px Ubuntu";
             b.font = f;
-            var h = b.measureText(c).width,
-              g = ~~(.2 * e);
-            a.width = (h + 6) * d;
-            a.height = (e + g) * d;
+            var g = b.measureText(c).width,
+              h = ~~(.2 * e);
+            a.width = (g + 6) * d;
+            a.height = (e + h) * d;
             b.font = f;
             b.scale(d, d);
             b.globalAlpha = 1;
             b.lineWidth = 3;
             b.strokeStyle = this._strokeColor;
             b.fillStyle = this._color;
-            this._stroke && b.strokeText(c, 3, e - g / 2);
-            b.fillText(c, 3, e - g / 2)
+            this._stroke && b.strokeText(c, 3, e - h / 2);
+            b.fillText(c, 3, e - h / 2)
           }
           return this._canvas
         }
       };
-
-      ya();  // Go!!
+      f.onload = Ha
+      Ha();  // meow, Go!!
     }
   }
 };
+
+
+// Known variables:
+// p: canvas width
+// m: canvas height
+// O: window coordinate x
+// P: window coordinate y
+// Q: absolute coordinate x
+// R: absoulte coordinate y
+// H: the quad-tree
+// $, z: canvas
+// e: canvas.getContex('2d')
+// g: a list stores our player's circles
+// w: a dict stores circles
+// q: a list stores circles
+// C: for garbage (the one who is destroyed...)
+// y: members in the leader board.
