@@ -4,6 +4,8 @@
 
 HOSTNAME='agar.io'
 
+BRANCH="$1"
+
 
 beautify() {
   src="$1"
@@ -31,7 +33,7 @@ main() {
   git add main.js
   git commit --allow-empty -m "update to ${version}"
 
-  git checkout master
+  git checkout "${BRANCH}"
   git rebase api_init_point
 }
 
