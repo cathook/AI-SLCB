@@ -103,7 +103,7 @@ ai.EDeDanXiaoGuay.prototype.getEscapePosition2 = function(agent, oppns, spikes) 
   boundary.push(new math.Vector2D(agent.circles[0].center.x, 0 + myRadius / 2))
   boundary.push(new math.Vector2D(agent.circles[0].center.y, 11180 - myRadius / 2))
   for (var i = 0; needToEscape === true && i < 4; i ++) {
-    console.log(agent.circles[0].center.minus(boundary[i]).length())
+    //! console.log(agent.circles[0].center.minus(boundary[i]).length())
     bad = api.getDangerRadius();
     delta = agent.circles[0].center.minus(boundary[i])
     if (delta.length() < 200) {
