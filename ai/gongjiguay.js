@@ -25,7 +25,7 @@ ai.GongJiGuay.prototype.run = function() {
   var foods = api.getFoods();
   var spikes = api.getSpikes();
 
-  var esc = this._ededanxiaoguay.getEscapePosition(agent, opponents, spikes);
+  var esc = this._ededanxiaoguay.getEscapePosition2(agent, opponents, spikes);
   var target;
   var atk = false;
   var atk_flag = 0;
@@ -41,7 +41,8 @@ ai.GongJiGuay.prototype.run = function() {
     }
     
     if (atk === false) {
-      target = this._esiguay.getTargetPosition(agent, foods);
+      //! Now using getTargetPosition2
+      target = this._esiguay.getTargetPosition2(agent, foods);
       this._targetPoint.type = this._targetPoint.Type.TARGET;  
     } else {
       atk_flag = 1;

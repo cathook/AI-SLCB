@@ -41,3 +41,41 @@ ai.ESiGuay.prototype.getTargetPosition = function(agent, foods) {
   };
   return ret;
 };
+
+ai.ESiGuay.prototype.getTargetPosition2 = function(agent, foods) {
+
+ 
+
+  var getDistance = function(agent, vec, food) {
+    var normedFoodCenter = food.center.minus(agent.circles[0].center);
+    cosTheta = (vec.x * normedFoodCenter.x + vec.y * normedFoodCenter.y) / (vec.length() * normedFoodCenter.length());
+    if (cosTheta < 0) {
+      return Infinity;
+    } else {
+      return normedFoodCenter.length() * (1 - Math.sqrt(1 - Math.pow(cosTheta, 2)));
+    }
+  }
+  var ret;
+  var myRadius = agent.circles[0].radius;
+  if (foods.length == 0) {
+    ret = agent.circles[0].center.clone();
+  } else {
+    var foodCount = 0;
+    var mostIndex = 0;
+    for (var i = 0; i < foods.length; i ++) {
+      var vec = agent.circles[0].center.minus(foods[i].center);
+      var tmpFoodCount = 0;
+      for (var j = 0; j < foods.length; j ++) {
+        if (getDistance(agent, vec, foods[i]) < myRadius) {
+          tmpFoodCount ++;
+        }
+      }
+      if (tmpFoodCount > foodCount) {
+        foodCount = tmpFoodCount;
+        mostIndex = i;
+      }
+    }
+    ret = foods[mostIndex].center.clone();
+  }
+  return ret;
+}
