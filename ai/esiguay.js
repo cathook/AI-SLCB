@@ -27,7 +27,8 @@ ai.ESiGuay.prototype.run = function() {
 ai.ESiGuay.prototype.getTargetPosition = function(agent, foods) {
   var ret;
   if (foods.length == 0) {
-    ret = agent.circles[0].clone();
+    ret = agent.circles[0].center.clone();
+    console.log('no food!');
   } else {
     var nearest = 0, mindist = Number.POSITIVE_INFINITY;
     for (var i = 0; i < foods.length; ++i) {
