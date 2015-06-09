@@ -978,13 +978,13 @@ api.agar.init = function(util, math) {
       // case 32:
       // if (null == w)
       // prototype -> class name
-      var all = n, our = E;
+      var all = n, ourIds = E;
       api.agar._ourCirclesInfo = [];
       api.agar._spikeCirclesInfo = [];
       api.agar._otherCirclesInfo = [];
       for (var i = 0; i < all.length; ++i) {
         var circleInfo = new api.agar.CircleInfo(all[i]);
-        if (our.indexOf(all[i]) >= 0) {
+        if (ourIds.indexOf(all[i].id) >= 0) {
           api.agar._ourCirclesInfo.push(circleInfo);
         } else if (all[i].isVirus) {
           api.agar._spikeCirclesInfo.push(circleInfo);
