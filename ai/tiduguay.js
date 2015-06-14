@@ -16,9 +16,9 @@ ai.ti_du_guay.init = function(util, math, mark, api) {
     this.setValue(this.MAX_VALUE, this.POW);
   };
 
-  _.CenterFunc.prototype.MAX_VALUE = 10;
+  _.CenterFunc.prototype.MAX_VALUE = 160;
 
-  _.CenterFunc.prototype.POW = 3;
+  _.CenterFunc.prototype.POW = 2;
 
   _.CenterFunc.prototype.setValue = function(maxValue, pow) {
     this._maxValue = maxValue;
@@ -26,13 +26,13 @@ ai.ti_du_guay.init = function(util, math, mark, api) {
   };
 
   _.CenterFunc.prototype.getValue = function(pos) {
-    var rat = pos.minus(this._center).length() / this._center.length();
+    var rat = pos.minus(this._center).length() / this._center.x;
     return Math.pow(rat, this._pow) * this._maxValue;
   };
 
   _.CenterFunc.prototype.getGrad = function(pos) {
     var delta = pos.minus(this._center);
-    var a = this._maxValue / Math.pow(this._center.length(), this._pow);
+    var a = this._maxValue / Math.pow(this._center.x, this._pow);
     var x = math.getDistanceGrad(delta);
     return math.getDistanceGrad(delta).times(
         a * this._pow * Math.pow(delta.length(), this._pow - 1));
@@ -72,7 +72,7 @@ ai.ti_du_guay.init = function(util, math, mark, api) {
 
   _.SmallDangerFunc.prototype.DEFAULT_RATIO = 4;
 
-  _.SmallDangerFunc.prototype.MAX_VALUE = 5;
+  _.SmallDangerFunc.prototype.MAX_VALUE = 10;
 
   _.SmallDangerFunc.prototype.setParam = function(ratio, maxValue) {
     var y0 = (this._radius - this._radius0) / ratio * maxValue;
@@ -99,14 +99,14 @@ ai.ti_du_guay.init = function(util, math, mark, api) {
 
   _.LargeDangerFunc.prototype.HALF_DIST_RATIO = 3;
 
-  _.LargeDangerFunc.prototype.MAX_VALUE = 50;
+  _.LargeDangerFunc.prototype.MAX_VALUE = 30;
 
   _.LargeDangerFunc.prototype.VK = 0.5;
 
   _.LargeDangerFunc.prototype.DK = 2;
 
   _.LargeDangerFunc.prototype.setParam = function(r, h, m, vk, dk) {
-    var halfDist = this._radius * h;
+    var halfDist = this._radius0 * h;
     var delta = Math.abs(this._radius - r * this._radius0);
     var maxValue = m * Math.exp(-delta / halfDist * math.LOG2);
 
@@ -127,7 +127,7 @@ ai.ti_du_guay.init = function(util, math, mark, api) {
 
   util.setInheritFrom(_.FoodFunc, _.SegsLinearFunc);
 
-  _.FoodFunc.prototype.MAX_VALUE = 2;
+  _.FoodFunc.prototype.MAX_VALUE = 5;
 
   _.FoodFunc.prototype.R = 0.3;
 
@@ -154,7 +154,7 @@ ai.ti_du_guay.init = function(util, math, mark, api) {
 
   util.setInheritFrom(_.SpikeFunc, _.SegsLinearFunc);
 
-  _.SpikeFunc.prototype.MAX_VALUE = 2;
+  _.SpikeFunc.prototype.MAX_VALUE = 20;
 
   _.SpikeFunc.prototype.RADIUS_RATIO = 1;
 
@@ -199,6 +199,8 @@ ai.TiDuGuay.prototype.run = function() {
   for (var i = 0; i < this._funcs.length; ++i) {
     dir.addToThis(this._funcs[i].getGrad(me.center).times(-1));
   }
+  
+  console.log(dir.length());
 
   api.setTargetPosition(me.center.add(dir.normalize().times(me.radius * 10)));
 };
@@ -219,7 +221,7 @@ ai.TiDuGuay.prototype.setFunc = function(me) {
   for (var i = 0, opp = api.getOpponents(); i < opp.length; ++i) {
     this._funcs = this._funcs.concat(
         util.transformArray(opp[i].circles, function(c) {
-          if (c.radius > 1.6 * me.radius || true) {
+          if (c.radius > 1.5 * me.radius) {
             return new ai.ti_du_guay.LargeDangerFunc(c, me);
           } else {
             return new ai.ti_du_guay.SmallDangerFunc(c, me);
@@ -231,7 +233,7 @@ ai.TiDuGuay.prototype.setFunc = function(me) {
 ai.TiDuGuay.prototype._getLargestSelf = function() {
   var ret = null, cand = api.getSelf().circles;
   for (var i = 0; i < cand.length; ++i) {
-    if (ret == null || ret.radius < cand[i]) {
+    if (ret == null || ret.radius < cand[i].radius) {
       ret = cand[i];
     }
   }
