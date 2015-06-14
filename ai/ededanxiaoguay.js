@@ -107,7 +107,7 @@ ai.EDeDanXiaoGuay.prototype.getEscapePosition2 = function(agent, oppns, spikes) 
     bad = api.getDangerRadius();
     delta = agent.circles[0].center.minus(boundary[i])
     if (delta.length() < 200) {
-      update(delta.normalize(), 2 * (bad - delta.length() / bad))
+      update(delta.normalize(), 2 * (bad - delta.length()) / bad)
     }
   }
 

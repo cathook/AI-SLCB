@@ -44,47 +44,55 @@ ai.ESiGuay.prototype.getTargetPosition = function(agent, foods) {
 };
 
 ai.ESiGuay.prototype.getTargetPosition2 = function(agent, foods) {
-
- 
+  var ret;
 
   var getDistance = function(agent, vec, food) {
-    var normedFoodCenter = food.center.minus(agent.circles[0].center);
-    //! console.log(vec)
-    //! console.log(normedFoodCenter)
+      var normedFoodCenter = food.center.minus(agent.circles[0].center);
+      //! console.log(vec)
+      //! console.log(normedFoodCenter)
 
-    cosTheta = (vec.x * normedFoodCenter.x + vec.y * normedFoodCenter.y) / (vec.length() * normedFoodCenter.length());
-    //! console.log(cosTheta);
-    if (cosTheta < 0) {
-      return Infinity;
-    } else {
-      //! console.log(normedFoodCenter.length() * (1 - Math.sqrt(1 - Math.pow(cosTheta, 2))));
-      return normedFoodCenter.length() * Math.sqrt(1 - Math.pow(cosTheta, 2));
-    }
-  };
-  var ret;
-  var myRadius = agent.circles[0].radius;
-  if (foods.length == 0) {
-    ret = agent.circles[0].center.clone();
+      cosTheta = (vec.x * normedFoodCenter.x + vec.y * normedFoodCenter.y) / (vec.length() * normedFoodCenter.length());
+      //! console.log(cosTheta);
+      if (cosTheta < 0) {
+        return Infinity;
+      } else {
+        //! console.log(normedFoodCenter.length() * (1 - Math.sqrt(1 - Math.pow(cosTheta, 2))));
+        return normedFoodCenter.length() * Math.sqrt(1 - Math.pow(cosTheta, 2));
+      }
+    };
+  //! console.log(window.tmp);
+  if ((+new Date) - (window.tmpTime) < 500) {
+    ret = window.tmp;
   } else {
-    var foodCount = 0;
-    var mostIndex = 0;
-    for (var i = 0; i < foods.length; i ++) {
-      //! var vec = agent.circles[0].center.minus(foods[i].center);
-      var vec = foods[i].center.minus(agent.circles[0].center);
-      var tmpFoodCount = 0;
-      for (var j = 0; j < foods.length; j ++) {
-        if (getDistance(agent, vec, foods[j]) < 0.9 * myRadius) {
-          tmpFoodCount ++;
+    
+    var myRadius = agent.circles[0].radius;
+    if (foods.length == 0) {
+      ret = agent.circles[0].center.clone();
+    } else {
+      var foodCount = 0;
+      var mostIndex = 0;
+      for (var i = 0; i < foods.length; i ++) {
+        //! var vec = agent.circles[0].center.minus(foods[i].center);
+        var vec = foods[i].center.minus(agent.circles[0].center);
+        var tmpFoodCount = 0;
+        for (var j = 0; j < foods.length; j ++) {
+          if (getDistance(agent, vec, foods[j]) < 0.9 * myRadius) {
+            tmpFoodCount ++;
+          }
+        }
+        if (tmpFoodCount > foodCount) {
+          foodCount = tmpFoodCount;
+          mostIndex = i;
         }
       }
-      if (tmpFoodCount > foodCount) {
-        foodCount = tmpFoodCount;
-        mostIndex = i;
-      }
+      //! console.log("Total food")
+      //! console.log(foodCount)
+      ret = foods[mostIndex].center.clone();
+      window.tmp = ret;
+      window.tmpTime = +new Date;
     }
-    //! console.log("Total food")
-    //! console.log(foodCount)
-    ret = foods[mostIndex].center.clone();
   }
   return ret;
+ 
+
 }
