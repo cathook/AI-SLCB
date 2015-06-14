@@ -27,7 +27,7 @@ extension.initFunc = function() {
   api.setSelfName('AI');
   api.setRegion('JP-Tokyo');
 
-  ai.setAgent(new ai.GongJiGuay());
+  ai.setAgent(new ai.JiaoDuGuay());
   ai.start();
 };
 
