@@ -18,7 +18,7 @@ ai.JiaoDuGuay.prototype.run = function() {
   var foods = api.getFoods();
   var spikes = api.getSpikes();
 
-  this._origin = new Vector2D(agnet.circles[0]
+  this._origin = new Vector2D(agnet.circles[0]);
   ai.JiaoDuGuay._setToOrigin(agent, foods, oppns, spikes);
   var target = this.getJiaoDu(agent, foods, opponents, spikes);
   api.setTargetPosition(target.add(this._origin));
@@ -36,9 +36,9 @@ ai.JiaoDuGuay.prototype.getJiaoDu = function(agent, foods, oppns, spikes) {
     this._slope = new Vector2D(-Math.sin(angle), Math.cos(angle));
   
     //get food value
-    [negTmp, posTmp] = ai.JiaoDuGuay._getFoodsVal(me, foods);
-    negVal += negTmp;
-    posVal += posTmp;
+    val = ai.JiaoDuGuay._getFoodsVal(me, foods);
+    posVal += val[0];
+    negVal += val[1];
     
     if (negVal > maxVal) {
       maxVal = negVal;
@@ -75,7 +75,7 @@ ai.JiaoDuGuay.prototype._getFoodsVal = function(agent, foods) {
   var posVal = 0;
   var negVal = 0;
   for (var i = 0; i < foods.length; i++) {
-    if (! this._inArea(foods[i], agent.radius)
+    if (! this._inArea(foods[i], agent.radius))
       continue;
     var food = foods[i];
     if (this._isPositive(food)) {
