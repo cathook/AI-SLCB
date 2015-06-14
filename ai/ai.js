@@ -31,6 +31,8 @@ ai.Agent.prototype.run = function() {};
  * @param [in] api The depenedency module `api`
  */
 ai.init = function(util, math, mark, api) {
+  ai.ti_du_guay.init(util, math, mark, api);
+
   /*!
    * @function Starts the AI.
    */
@@ -120,7 +122,7 @@ ai.init = function(util, math, mark, api) {
   /*!
    * @var Time interval.
    */
-  ai._deltaTime = 100;
+  ai._deltaTime = 200;
 
 
   /*!

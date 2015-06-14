@@ -6,7 +6,7 @@ var extension = extension || {};  //!< namespace extension
  */
 extension.initFunc = function() {
   util.init();
-  math.init();
+  math.init(util);
   mark.init(util, math);
   api.init(util, math, mark);
   ai.init(util, math, mark, api);
@@ -14,8 +14,10 @@ extension.initFunc = function() {
   api.registerKeyboardHandler('aA', function() {
     if (api.isUserMode()) {
       api.switchToAIMode();
+      ai.start();
     } else {
       api.switchToUserMode();
+      ai.stop();
     }
   });
 
@@ -27,7 +29,7 @@ extension.initFunc = function() {
   api.setSelfName('AI');
   api.setRegion('JP-Tokyo');
 
-  ai.setAgent(new ai.GongJiGuay());
+  ai.setAgent(new ai.TiDuGuay());
   ai.start();
 };
 
