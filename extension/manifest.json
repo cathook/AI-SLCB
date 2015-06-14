@@ -10,7 +10,7 @@
   
   "content_scripts" : [
     {
-      "matches" : ["http://agar.io/"],
+      "matches" : ["http://agar.io/", "https://agar.io/*"],
       "js" : ["content.js"],
       "run_at" : "document_end"
     }
