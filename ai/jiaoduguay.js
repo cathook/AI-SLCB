@@ -1,7 +1,6 @@
 var ai = ai || {};  //!< namespace ai
 
 ai.JiaoDuGuay = function() {
-  this.jiaoduguay = new ai.JiaoDuGuay();
 };
 
 ai.JiaoDuGuay.prototype.init = function() {
@@ -18,31 +17,32 @@ ai.JiaoDuGuay.prototype.run = function() {
   var foods = api.getFoods();
   var spikes = api.getSpikes();
 
-  this._origin = new Vector2D(agnet.circles[0]);
-  ai.JiaoDuGuay._setToOrigin(agent, foods, oppns, spikes);
+  this._origin = new math.Vector2D(agent.circles[0].center);
+  this._setToOrigin(agent, foods, opponents, spikes);
   var target = this.getJiaoDu(agent, foods, opponents, spikes);
-  api.setTargetPosition(target.add(this._origin));
+  console.log(target);
+  api.setTargetPosition(target.add);
 };
 
 ai.JiaoDuGuay.prototype.getJiaoDu = function(agent, foods, oppns, spikes) {
   var maxAng = 0;
   var maxVal = Number.NEGATIVE_INFINITY;
 
-  var me = agent.cirlces[0];
+  var me = agent.circles[0];
   for (var angle = 0; angle < Math.PI; angle += (Math.PI / 10)) {
     var negVal = 0;
     var posVal = 0;
 
-    this._slope = new Vector2D(-Math.sin(angle), Math.cos(angle));
+    this._slope = new math.Vector2D(-Math.sin(angle), Math.cos(angle));
   
     //get food value
-    val = ai.JiaoDuGuay._getFoodsVal(me, foods);
+    val = this._getFoodsVal(me, foods);
     posVal += val[0];
     negVal += val[1];
     
     if (negVal > maxVal) {
       maxVal = negVal;
-      maxAng = angle;
+      maxAng = angle + Math.PI;;
     }
     if (posVal > maxVal) {
       maxVal = posVal;
@@ -50,6 +50,15 @@ ai.JiaoDuGuay.prototype.getJiaoDu = function(agent, foods, oppns, spikes) {
     }
 
   }
+  console.log('angle ' + (angle / Math.PI * 180) + ', ' + me.radius);
+
+  ret =  new math.Vector2D(Math.cos(angle), Math.sin(angle))
+                 .timesToThis(me.radius * 3)
+  ret.addToThis(this._origin)
+  console.log('origin ' + (this._origin.x) + ', ' + this._origin.y);
+  ret.x = Math.max(0, ret.x);
+  ret.y = Math.max(0, ret.y);
+  return ret;
 };
 
 ai.JiaoDuGuay.prototype._setToOrigin = function(agent, foods, oppns, spikes) {
@@ -96,9 +105,9 @@ ai.JiaoDuGuay.prototype._isPositive = function(center) {
 };
 
 ai.JiaoDuGuay.prototype._inArea = function(circle, dis) {
-  var r1 = circle.center.add(new Vector2D(this._slope).times(circle.radius));
-  var r2 = circle.center.add(new Vector2D(this._slope).times(-circle.radius));
-  var edge = new Vector2D(this._slope.y, -this._slope.x);
+  var r1 = circle.center.add(new math.Vector2D(this._slope).times(circle.radius));
+  var r2 = circle.center.add(new math.Vector2D(this._slope).times(-circle.radius));
+  var edge = new math.Vector2D(this._slope.y, -this._slope.x);
   return Math.abs(this._getLineDistance(circle)) <= dis;
 };
 
