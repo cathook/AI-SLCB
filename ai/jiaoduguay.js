@@ -21,7 +21,7 @@ ai.JiaoDuGuay.prototype.run = function() {
   this._setToOrigin(agent, foods, opponents, spikes);
   var target = this.getJiaoDu(agent, foods, opponents, spikes);
   console.log(target);
-  api.setTargetPosition(target.add);
+  api.setTargetPosition(target);
 };
 
 ai.JiaoDuGuay.prototype.getJiaoDu = function(agent, foods, oppns, spikes) {
@@ -29,33 +29,38 @@ ai.JiaoDuGuay.prototype.getJiaoDu = function(agent, foods, oppns, spikes) {
   var maxVal = Number.NEGATIVE_INFINITY;
 
   var me = agent.circles[0];
-  for (var angle = 0; angle < Math.PI; angle += (Math.PI / 10)) {
+  for (var angle = 0; angle < Math.PI; angle += (Math.PI / 100)) {
     var negVal = 0;
     var posVal = 0;
 
-    this._slope = new math.Vector2D(-Math.sin(angle), Math.cos(angle));
+    this._norm = new math.Vector2D(-Math.sin(angle), Math.cos(angle));
   
     //get food value
-    val = this._getFoodsVal(me, foods);
+    var val = this._getFoodsVal(me, foods);
     posVal += val[0];
     negVal += val[1];
     
+    val = this._getOppnsVal(me, oppns);
+    posVal += val[0];
+    negVal += val[1];
+
+    val = this._getSpikesVal(me, spikes);
+    posVal += val[0];
+    negVal += val[1];
+
     if (negVal > maxVal) {
       maxVal = negVal;
-      maxAng = angle + Math.PI;;
+      maxAng = angle + Math.PI;
     }
     if (posVal > maxVal) {
       maxVal = posVal;
       maxAng = angle;
     }
-
   }
-  console.log('angle ' + (angle / Math.PI * 180) + ', ' + me.radius);
 
-  ret =  new math.Vector2D(Math.cos(angle), Math.sin(angle))
+  ret =  new math.Vector2D(Math.cos(maxAng), Math.sin(maxAng))
                  .timesToThis(me.radius * 3)
-  ret.addToThis(this._origin)
-  console.log('origin ' + (this._origin.x) + ', ' + this._origin.y);
+                 .addToThis(this._origin);
   ret.x = Math.max(0, ret.x);
   ret.y = Math.max(0, ret.y);
   return ret;
@@ -66,17 +71,17 @@ ai.JiaoDuGuay.prototype._setToOrigin = function(agent, foods, oppns, spikes) {
     agent.circles[i].center.minusToThis(this._origin);
   }
 
-  for (var  i = 0; i < foods; i++) {
-    foods.center.minusToThis(this._origin);
+  for (var  i = 0; i < foods.length; i++) {
+    foods[i].center.minusToThis(this._origin);
   }
 
-  for (var i = 0; i < oppns; i++)
+  for (var i = 0; i < oppns.length; i++)
     for (var j = 0; j < oppns[i].circles.length; j++) {
       oppns[i].circles[j].center.minusToThis(this._origin);
     }
 
-  for (var i = 0; i < spikes; i++) {
-    spikes.center.minusToThis(this._origin);
+  for (var i = 0; i < spikes.length; i++) {
+    spikes[i].center.minusToThis(this._origin);
   }
 } 
 
@@ -84,10 +89,11 @@ ai.JiaoDuGuay.prototype._getFoodsVal = function(agent, foods) {
   var posVal = 0;
   var negVal = 0;
   for (var i = 0; i < foods.length; i++) {
-    if (! this._inArea(foods[i], agent.radius))
+    if (! this._inLine(foods[i], agent.radius, i)) {
       continue;
+    }
     var food = foods[i];
-    if (this._isPositive(food)) {
+    if (this._isPositive(food.center)) {
       posVal += this._getFoodVal(food);
     } else {
       negVal += this._getFoodVal(food);
@@ -96,21 +102,69 @@ ai.JiaoDuGuay.prototype._getFoodsVal = function(agent, foods) {
   return [posVal, negVal];
 }; 
 
+ai.JiaoDuGuay.prototype._getOppnsVal = function(agent, oppns) {
+  var posVal = 0;
+  var negVal = 0;
+  for (var i = 0; i < oppns.length; i++) {
+    for (var j = 0; j < oppns[i].circles.length; j++) {
+      var oppn = oppns[i].circles[j];
+      if (!this._inLine(oppn, agent.radius, 1.5)) {
+        continue;
+      }
+      if (this._isPositive(oppn.center)) {
+        posVal += this._getOppnVal(oppn);
+        negVal -= this._getOppnVal(oppn);
+      } else {
+        negVal += this._getOppnVal(oppn);
+        posVal -= this._getOppnVal(oppn);
+      }
+    }
+  }
+  return [posVal, negVal];
+};
+
+ai.JiaoDuGuay.prototype._getSpikesVal = function(agent, spikes) {
+  var posVal = 0;
+  var negVal = 0;
+  for (var i = 0; i < spikes.length; i++) {
+    var spike = spikes[i];
+    if (spike.radius > agent.radius || !this._inLine(spike, agent.radius, 1)) {
+      continue;
+    }
+    if (this._isPositive(spike.center)) {
+      posVal += this._getSpikeVal(oppn);
+    } else {
+      negVal += this._getSpikeVal(oppn);
+    }
+  }
+  return [posVal, negVal];
+};
+
 ai.JiaoDuGuay.prototype._getFoodVal = function(food) {
-  return 100 * food.radius / this._origin.minus(food).length2();
+  return 100 * food.radius * food.radius * food.radius * food.radius
+          / food.center.length2();
+};
+
+ai.JiaoDuGuay.prototype._getOppnVal = function(oppn) {
+  return -10 * oppn.radius / Math.sqrt(oppn.center.length());
+};
+
+ai.JiaoDuGuay.prototype._getSpikeVal = function(spike) {
+  return -spike.radius / spike.center.length();
 };
 
 ai.JiaoDuGuay.prototype._isPositive = function(center) {
-  return this._slope.cross(center) <= 0;
+  return this._norm.cross(center) <= 0;
 };
 
-ai.JiaoDuGuay.prototype._inArea = function(circle, dis) {
-  var r1 = circle.center.add(new math.Vector2D(this._slope).times(circle.radius));
-  var r2 = circle.center.add(new math.Vector2D(this._slope).times(-circle.radius));
-  var edge = new math.Vector2D(this._slope.y, -this._slope.x);
-  return Math.abs(this._getLineDistance(circle)) <= dis;
+ai.JiaoDuGuay.prototype._inLine = function(circle, dis, par) {
+  var r1 = circle.center.add(new math.Vector2D(this._norm).times(circle.radius));
+  var r2 = circle.center.add(new math.Vector2D(this._norm).times(-circle.radius));
+  return (this._norm.dot(r1) + dis * par) * (this._norm.dot(r2) - dis * par) <= 0;
+  
+  //return this._getLineDistance(r1) <= dis || this._getLineDistance(r2) <= dis;
 };
 
 ai.JiaoDuGuay.prototype._getLineDistance = function(center) {
-  return this._slope.dot(center) / this._slope.length();
+  return Math.abs(this._norm.dot(center)); // this._norm.length();
 };
