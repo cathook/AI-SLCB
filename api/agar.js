@@ -24,8 +24,8 @@ api.agar.init = function(util, math) {
     this.name = agarCircle.name;
     this.center = new math.Vector2D(agarCircle.x, agarCircle.y);
     this.radius = agarCircle.size;
-    this._delta = new math.Vector2D(agarCircle.F - agarCircle.p,
-                                    agarCircle.G - agarCircle.q);
+    this._delta = new math.Vector2D(agarCircle.D - agarCircle.p,
+                                    agarCircle.F - agarCircle.q);
     this._t0 = agarCircle.N;
 
     this.velocity = null;
