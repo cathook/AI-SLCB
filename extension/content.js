@@ -29,7 +29,7 @@ extension.initFunc = function() {
   api.setSelfName('AI');
   api.setRegion('JP-Tokyo');
 
-  ai.setAgent(new ai.JiaoDuGuay());
+  ai.setAgent(new ai.TiDuGuay());
   ai.start();
 };
 

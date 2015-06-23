@@ -20,7 +20,6 @@ ai.JiaoDuGuay.prototype.run = function() {
   this._origin = new math.Vector2D(agent.circles[0].center);
   this._setToOrigin(agent, foods, opponents, spikes);
   var target = this.getJiaoDu(agent, foods, opponents, spikes);
-  console.log(target);
   api.setTargetPosition(target);
 };
 
