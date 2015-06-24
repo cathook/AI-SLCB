@@ -20,7 +20,7 @@ api.agar.init = function(util, math) {
    * @var _delta The (nx, ny) minus (ox, oy)
    * @var _t0 t
    */
-  api.agar.CircleInfo = function(agarCircle) {
+  api.agar.CircleInfo = function(agarCircle) {  // meow
     this.name = agarCircle.name;
     this.center = new math.Vector2D(agarCircle.x, agarCircle.y);
     this.radius = agarCircle.size;
@@ -371,17 +371,17 @@ api.agar.init = function(util, math) {
   //     be followed a comment "meow".
   //
   //////////////////////////////////////////////////////////
-  f = window;  // meow
+  g = window;  // meow
   m = window.jQuery;  // meow
 
-  function Ua() {
-    ma = !0;
-    za();
-    setInterval(za, 18E4);
-    C = na = document.getElementById("canvas");
-    g = C.getContext("2d");
+  function Wa() {
+    pa = !0;
+    Ca();
+    setInterval(Ca, 18E4);
+    C = qa = document.getElementById("canvas");
+    f = C.getContext("2d");
     C.onmousedown = function(a) {
-      if (Aa) {
+      if (Da) {
         var b = a.clientX - (5 + q / 5 / 2),
           c = a.clientY - (5 + q / 5 / 2);
         if (Math.sqrt(b * b + c * c) <= q / 5 / 2) {
@@ -390,64 +390,64 @@ api.agar.init = function(util, math) {
           return
         }
       }
-      U = a.clientX;
-      V = a.clientY;
-      oa();
+      V = a.clientX;
+      W = a.clientY;
+      ra();
       N()
     };
     C.onmousemove = function(a) {
-      U = a.clientX;
-      V = a.clientY;
-      oa()
+      V = a.clientX;
+      W = a.clientY;
+      ra()
     };
     C.onmouseup = function() {};
-    /firefox/i.test(navigator.userAgent) ? document.addEventListener("DOMMouseScroll", Ba, !1) : document.body.onmousewheel = Ba;
+    /firefox/i.test(navigator.userAgent) ? document.addEventListener("DOMMouseScroll", Ea, !1) : document.body.onmousewheel = Ea;
     var a = !1,
       b = !1,
       c = !1;
-    f.onkeydown = function(d) {
+    g.onkeydown = function(d) {
       32 != d.keyCode || a || (N(), D(17), a = !0);
       81 != d.keyCode || b || (D(18), b = !0);
       87 != d.keyCode || c || (N(), D(21), c = !0);
-      27 == d.keyCode && Ca(!0)
+      27 == d.keyCode && Fa(!0)
     };
-    f.onkeyup = function(d) {
+    g.onkeyup = function(d) {
       32 == d.keyCode && (a = !1);
       87 == d.keyCode && (c = !1);
       81 == d.keyCode && b && (D(19), b = !1)
     };
-    f.onblur = function() {
+    g.onblur = function() {
       D(19);
       c = b = a = !1
     };
-    f.onresize = Da;
+    g.onresize = Ga;
 
-    api.agar._replaceEventHandlers(f, C);  // meow
+    api.agar._replaceEventHandlers(g, C);  // meow
 
-    f.requestAnimationFrame ? f.requestAnimationFrame(Ea) : setInterval(pa, 1E3 / 60);
+    g.requestAnimationFrame ? g.requestAnimationFrame(Ha) : setInterval(sa, 1E3 / 60);
     setInterval(N, 40);
     w && m("#region").val(w);
-    Fa();
-    W(m("#region").val());
-    null == s && w && X();
+    Ia();
+    X(m("#region").val());
+    null == s && w && Y();
     m("#overlays").show();
-    Da()
+    Ga()
   }
 
-  function Ba(a) {
+  function Ea(a) {
     E *= Math.pow(.9, a.wheelDelta / -120 || a.detail || 0);
     1 > E && (E = 1);
     E > 4 / k && (E = 4 / k)
   }
 
-  function Va() {
+  function Xa() {
     if (.4 > k) O = null;
     else {
       for (var a = Number.POSITIVE_INFINITY, b = Number.POSITIVE_INFINITY, c = Number.NEGATIVE_INFINITY, d = Number.NEGATIVE_INFINITY, e = 0, l = 0; l < v.length; l++) {
         var h = v[l];
         !h.I() || h.M || 20 >= h.size * k || (e = Math.max(h.size, e), a = Math.min(h.x, a), b = Math.min(h.y, b), c = Math.max(h.x, c), d = Math.max(h.y, d))
       }
-      O = Wa.ca({
+      O = Ya.ca({
         X: a - (e + 100),
         Y: b - (e + 100),
         fa: c + (e + 100),
@@ -461,18 +461,18 @@ api.agar.init = function(util, math) {
     }
   }
 
-  function oa() {
-    Y = (U - q / 2) / k + t;
-    Z = (V - r / 2) / k + u
+  function ra() {
+    Z = (V - q / 2) / k + t;
+    $ = (W - r / 2) / k + u
   }
 
-  function za() {
-    null == $ && ($ = {}, m("#region").children().each(function() {
+  function Ca() {
+    null == aa && (aa = {}, m("#region").children().each(function() {
       var a = m(this),
         b = a.val();
-      b && ($[b] = a.text())
+      b && (aa[b] = a.text())
     }));
-    m.get(aa + "//m.agar.io/info", function(a) {
+    m.get(ba + "//m.agar.io/info", function(a) {
       var b = {},
         c;
       for (c in a.regions) {
@@ -480,54 +480,62 @@ api.agar.init = function(util, math) {
         b[d] = b[d] || 0;
         b[d] += a.regions[c].numPlayers
       }
-      for (c in b) m('#region option[value="' + c + '"]').text($[c] + " (" + b[c] + " players)")
+      for (c in b) m('#region option[value="' + c + '"]').text(aa[c] + " (" + b[c] + " players)")
     }, "json")
   }
 
-  function Ga() {
+  function Ja() {
     m("#adsBottom").hide();
     m("#overlays").hide();
-    Fa()
+    Ia()
   }
 
-  function W(a) {
-    a && a != w && (m("#region").val() != a && m("#region").val(a), w = f.localStorage.location = a, m(".region-message").hide(), m(".region-message." + a).show(), m(".btn-needs-server").prop("disabled", !1), ma && X())
+  function X(a) {
+    a && a != w && (m("#region").val() != a && m("#region").val(a), w = g.localStorage.location = a, m(".region-message").hide(), m(".region-message." + a).show(), m(".btn-needs-server").prop("disabled", !1), pa && Y())
   }
 
-  function Ca(a) {
+  function Fa(a) {
     F = null;
+    Za();
     m("#overlays").fadeIn(a ? 200 : 3E3);
     a || m("#adsBottom").fadeIn(3E3)
   }
 
-  function Fa() {
-    m("#region").val() ? f.localStorage.location = m("#region").val() : f.localStorage.location && m("#region").val(f.localStorage.location);
+  function Ia() {
+    m("#region").val() ? g.localStorage.location = m("#region").val() : g.localStorage.location && m("#region").val(g.localStorage.location);
     m("#region").val() ? m("#locationKnown").append(m("#region")) : m("#locationUnknown").append(m("#region"))
   }
 
-  function Ha() {
-    console.log("Find " + w + P);
-    m.ajax(aa + "//m.agar.io/", {
+  function Za() {
+    !ca || 75 <= P || (ca = !1, setTimeout(function() {
+      ca = !0
+    }, 6E4 * da), g.googletag.pubads().refresh([g.mainAd]))
+  }
+
+  function Ka() {
+    console.log("Find " + w + Q);
+    m.ajax(ba + "//m.agar.io/", {
       error: function() {
-        setTimeout(Ha, 1E3)
+        setTimeout(Ka, 1E3)
       },
       success: function(a) {
         a = a.split("\n");
-        Ia("ws://" + a[0], a[1])
+        a[2] && alert(a[2]);
+        La("ws://" + a[0], a[1])
       },
       dataType: "text",
       method: "POST",
       cache: !1,
       crossDomain: !0,
-      data: w + P || "?"
+      data: (w + Q || "?") + "\n154669603"
     })
   }
 
-  function X() {
-    ma && w && (m("#connecting").show(), Ha())
+  function Y() {
+    pa && w && (m("#connecting").show(), Ka())
   }
 
-  function Ia(a, b) {
+  function La(a, b) {
     if (s) {
       s.onopen = null;
       s.onmessage = null;
@@ -537,7 +545,7 @@ api.agar.init = function(util, math) {
       } catch (c) {}
       s = null
     }
-    if (Xa) {
+    if ($a) {
       var d = a.split(":");
       a = d[0] + "s://ip-" + d[1].replace(/\./g, "-").replace(/\//g, "") + ".tech.agar.io:" + (+d[2] + 2E3)
     }
@@ -549,7 +557,7 @@ api.agar.init = function(util, math) {
     B = [];
     x = y = null;
     J = 0;
-    qa = !1;
+    ta = !1;
     console.log("Connecting to " + a);
     s = new WebSocket(a);
     s.binaryType = "arraybuffer";
@@ -562,16 +570,16 @@ api.agar.init = function(util, math) {
       L(a);
       a = K(5);
       a.setUint8(0, 255);
-      a.setUint32(1, 154669859, !0);
+      a.setUint32(1, 154669603, !0);
       L(a);
       a = K(1 + b.length);
       a.setUint8(0, 80);
       for (var c = 0; c < b.length; ++c) a.setUint8(c + 1, b.charCodeAt(c));
       L(a);
-      Ja()
+      Ma()
     };
-    s.onmessage = Ya;
-    s.onclose = Za;
+    s.onmessage = ab;
+    s.onclose = bb;
     s.onerror = function() {
       console.log("socket error")
     }
@@ -585,18 +593,18 @@ api.agar.init = function(util, math) {
     s.send(a.buffer)
   }
 
-  function Za() {
-    qa && (ba = 500);
+  function bb() {
+    ta && (ea = 500);
     console.log("socket close");
-    setTimeout(X, ba);
-    ba *= 2
+    setTimeout(Y, ea);
+    ea *= 2
   }
 
-  function Ya(a) {
-    $a(new DataView(a.data))
+  function ab(a) {
+    cb(new DataView(a.data))
   }
 
-  function $a(a) {
+  function cb(a) {
     function b() {
       for (var b = "";;) {
         var d = a.getUint16(c, !0);
@@ -610,14 +618,14 @@ api.agar.init = function(util, math) {
     240 == a.getUint8(c) && (c += 5);
     switch (a.getUint8(c++)) {
       case 16:
-        ab(a, c);
+        db(a, c);
         break;
       case 17:
-        Q = a.getFloat32(c, !0);
-        c += 4;
         R = a.getFloat32(c, !0);
         c += 4;
         S = a.getFloat32(c, !0);
+        c += 4;
+        T = a.getFloat32(c, !0);
         c += 4;
         break;
       case 20:
@@ -625,11 +633,11 @@ api.agar.init = function(util, math) {
         G = [];
         break;
       case 21:
-        ra = a.getInt16(c, !0);
+        ua = a.getInt16(c, !0);
         c += 2;
-        sa = a.getInt16(c, !0);
+        va = a.getInt16(c, !0);
         c += 2;
-        ta || (ta = !0, ca = ra, da = sa);
+        wa || (wa = !0, fa = ua, ga = va);
         break;
       case 32:
         G.push(a.getUint32(c, !0));
@@ -648,29 +656,29 @@ api.agar.init = function(util, math) {
             name: b()
           })
         }
-        Ka();
+        Na();
         break;
       case 50:
         y = [];
         d = a.getUint32(c, !0);
         c += 4;
         for (e = 0; e < d; ++e) y.push(a.getFloat32(c, !0)), c += 4;
-        Ka();
+        Na();
         break;
       case 64:
-        ea = a.getFloat64(c, !0), c += 8, fa = a.getFloat64(c, !0), c += 8, ga = a.getFloat64(c, !0), c += 8, ha = a.getFloat64(c, !0), c += 8, Q = (ga + ea) / 2, R = (ha + fa) / 2, S = 1, 0 == p.length && (t = Q, u = R, k = S)
+        ha = a.getFloat64(c, !0), c += 8, ia = a.getFloat64(c, !0), c += 8, ja = a.getFloat64(c, !0), c += 8, ka = a.getFloat64(c, !0), c += 8, R = (ja + ha) / 2, S = (ka + ia) / 2, T = 1, 0 == p.length && (t = R, u = S, k = T)
     }
   }
 
-  function ab(a, b) {
+  function db(a, b) {
     H = +new Date;
 
     api.agar._circlesInfoChanged = true;  // meow
 
-    qa = !0;
+    ta = !0;
     m("#connecting").hide();
     var c = Math.random();
-    ua = !1;
+    xa = !1;
     var d = a.getUint16(b, !0);
     b += 2;
     for (var e = 0; e < d; ++e) {
@@ -682,17 +690,17 @@ api.agar.init = function(util, math) {
     for (e = 0;;) {
       d = a.getUint32(b, !0);
       b += 4;
-      if (0 == d) break;
+      if (0 ==
+        d) break;
       ++e;
-      var g, l = a.getInt16(b, !0);
+      var f, l = a.getInt16(b, !0);
       b += 2;
       h = a.getInt16(b, !0);
       b += 2;
-      g = a.getInt16(b, !0);
+      f = a.getInt16(b, !0);
       b += 2;
-      for (var f = a.getUint8(b++), k = a.getUint8(b++),
-          q = a.getUint8(b++), f = (f << 16 | k << 8 | q).toString(16); 6 > f.length;) f = "0" + f;
-      var f = "#" + f,
+      for (var g = a.getUint8(b++), k = a.getUint8(b++), q = a.getUint8(b++), g = (g << 16 | k << 8 | q).toString(16); 6 > g.length;) g = "0" + g;
+      var g = "#" + g,
         k = a.getUint8(b++),
         q = !!(k & 1),
         s = !!(k & 16);
@@ -707,12 +715,12 @@ api.agar.init = function(util, math) {
       }
       r = n;
       n = null;
-      A.hasOwnProperty(d) ? (n = A[d], n.K(), n.p = n.x, n.q = n.y, n.o = n.size, n.color = f) : (n = new La(d, l, h, g, f, r), v.push(n), A[d] = n, n.ka = l, n.la = h);
+      A.hasOwnProperty(d) ? (n = A[d], n.K(), n.p = n.x, n.q = n.y, n.o = n.size, n.color = g) : (n = new Oa(d, l, h, f, g, r), v.push(n), A[d] = n, n.ka = l, n.la = h);
       n.d = q;
       n.j = s;
       n.D = l;
       n.F = h;
-      n.n = g;
+      n.n = f;
       n.ja = c;
       n.L = H;
       n.W = k;
@@ -721,20 +729,20 @@ api.agar.init = function(util, math) {
     c = a.getUint32(b, !0);
     b += 4;
     for (e = 0; e < c; e++) d = a.getUint32(b, !0), b += 4, n = A[d], null != n && n.S();
-    ua && 0 == p.length && Ca(!1)
+    xa && 0 == p.length && Fa(!1)
   }
 
   function N() {
     var a;
-    if (va()) {
-      a = U - q / 2;
-      var b = V - r / 2;
-      64 > a * a + b * b || .01 > Math.abs(Ma - Y) && .01 > Math.abs(Na - Z) || (Ma = Y, Na = Z, a = K(21), a.setUint8(0, 16), a.setFloat64(1, Y, !0), a.setFloat64(9, Z, !0), a.setUint32(17, 0, !0), L(a))
+    if (ya()) {
+      a = V - q / 2;
+      var b = W - r / 2;
+      64 > a * a + b * b || .01 > Math.abs(Pa - Z) && .01 > Math.abs(Qa - $) || (Pa = Z, Qa = $, a = K(21), a.setUint8(0, 16), a.setFloat64(1, Z, !0), a.setFloat64(9, $, !0), a.setUint32(17, 0, !0), L(a))
     }
   }
 
-  function Ja() {
-    if (va() && null != F) {
+  function Ma() {
+    if (ya() && null != F) {
       var a = K(1 + 2 * F.length);
       a.setUint8(0, 0);
       for (var b = 0; b < F.length; ++b) a.setUint16(1 + 2 * b, F.charCodeAt(b), !0);
@@ -742,137 +750,135 @@ api.agar.init = function(util, math) {
     }
   }
 
-  function va() {
+  function ya() {
     return null != s && s.readyState == s.OPEN
   }
 
   function D(a) {
-    if (va()) {
+    if (ya()) {
       var b = K(1);
       b.setUint8(0, a);
       L(b)
     }
   }
 
-  function Ea() {
-    pa();
-    f.requestAnimationFrame(Ea)
+  function Ha() {
+    sa();
+    g.requestAnimationFrame(Ha)
   }
 
-  function Da() {
-    q = f.innerWidth;
-    r = f.innerHeight;
-    na.width = C.width = q;
-    na.height = C.height = r;
+  function Ga() {
+    q = g.innerWidth;
+    r = g.innerHeight;
+    qa.width = C.width = q;
+    qa.height = C.height = r;
     var a = m("#helloDialog");
     a.css("transform", "none");
     var b = a.height(),
-      c = f.innerHeight;
+      c = g.innerHeight;
     b > c / 1.1 ? a.css("transform", "translate(-50%, -50%) scale(" + c / b / 1.1 + ")") : a.css("transform", "translate(-50%, -50%)");
-    pa()
+    sa()
   }
 
-  function Oa() {
+  function Ra() {
     var a;
     a = 1 * Math.max(r / 1080, q / 1920);
     return a *= E
   }
 
-  function bb() {
+  function eb() {
     if (0 != p.length) {
       for (var a = 0, b = 0; b < p.length; b++) a += p[b].size;
-      a = Math.pow(Math.min(64 / a, 1), .4) * Oa();
+      a = Math.pow(Math.min(64 / a, 1), .4) * Ra();
       k = (9 * k + a) / 10
     }
   }
 
-  function pa() {
+  function sa() {
     var a, b = Date.now();
-    ++cb;
+    ++fb;
     H = b;
     if (0 < p.length) {
-      bb();
+      eb();
       for (var c = a = 0, d = 0; d < p.length; d++) p[d].K(), a += p[d].x / p.length, c += p[d].y / p.length;
-      Q = a;
-      R = c;
-      S = k;
+      R = a;
+      S = c;
+      T = k;
       t = (t + a) / 2;
       u = (u + c) / 2
-    } else t = (29 * t + Q) / 30, u = (29 * u + R) / 30, k = (9 * k + S * Oa()) / 10;
-    Va();
-    oa();
-    wa || g.clearRect(0, 0, q, r);
-    wa ? (g.fillStyle = ia ? "#111111" : "#F2FBFF", g.globalAlpha = .05, g.fillRect(0, 0, q, r), g.globalAlpha = 1) : db();
+    } else t = (29 * t + R) / 30, u = (29 * u + S) / 30, k = (9 * k + T * Ra()) / 10;
+    Xa();
+    ra();
+    za || f.clearRect(0, 0, q, r);
+    za ? (f.fillStyle = la ? "#111111" : "#F2FBFF", f.globalAlpha = .05, f.fillRect(0, 0, q, r), f.globalAlpha = 1) : gb();
     v.sort(function(a, b) {
-      return a.size == b.size ?
-        a.id - b.id : a.size - b.size
+      return a.size == b.size ? a.id - b.id : a.size - b.size
     });
-    g.save();
-    g.translate(q / 2, r / 2);
-    g.scale(k, k);
-    g.translate(-t, -u);
+    f.save();
+    f.translate(q / 2, r / 2);
+    f.scale(k, k);
+    f.translate(-t, -u);
 
-    api.agar._drawBefore(g);  // meow
+    api.agar._drawBefore(f);  // meow
 
-    for (d = 0; d < I.length; d++) I[d].T(g);
-    for (d = 0; d < v.length; d++) v[d].T(g);
+    for (d = 0; d < I.length; d++) I[d].T(f);
+    for (d = 0; d < v.length; d++) v[d].T(f);
 
-    api.agar._draw(g);  // meow
+    api.agar._draw(f);  // meow
 
-    if (ta) {
-      ca = (3 * ca + ra) / 4;
-      da = (3 * da + sa) / 4;
-      g.save();
-      g.strokeStyle = "#FFAAAA";
-      g.lineWidth = 10;
-      g.lineCap = "round";
-      g.lineJoin = "round";
-      g.globalAlpha = .5;
-      g.beginPath();
-      for (d = 0; d < p.length; d++) g.moveTo(p[d].x, p[d].y), g.lineTo(ca, da);
-      g.stroke();
-      g.restore()
+    if (wa) {
+      fa = (3 * fa + ua) / 4;
+      ga = (3 * ga + va) / 4;
+      f.save();
+      f.strokeStyle = "#FFAAAA";
+      f.lineWidth = 10;
+      f.lineCap = "round";
+      f.lineJoin = "round";
+      f.globalAlpha = .5;
+      f.beginPath();
+      for (d = 0; d < p.length; d++) f.moveTo(p[d].x,
+        p[d].y), f.lineTo(fa, ga);
+      f.stroke();
+      f.restore()
     }
-    g.restore();
-    x && x.width && g.drawImage(x, q - x.width - 10, 10);
-    J = Math.max(J, eb());
-    0 != J && (null == ja && (ja = new ka(24, "#FFFFFF")),
-      ja.u("Score: " + ~~(J / 100)), c = ja.G(), a = c.width, g.globalAlpha = .2, g.fillStyle = "#000000", g.fillRect(10, r - 10 - 24 - 10, a + 10, 34), g.globalAlpha = 1, g.drawImage(c, 15, r - 10 - 24 - 5));
-    fb();
+    f.restore();
+    x && x.width && f.drawImage(x, q - x.width - 10, 10);
+    J = Math.max(J, hb());
+    0 != J && (null == ma && (ma = new na(24, "#FFFFFF")), ma.u("Score: " + ~~(J / 100)), c = ma.G(), a = c.width, f.globalAlpha = .2, f.fillStyle = "#000000", f.fillRect(10, r - 10 - 24 - 10, a + 10, 34), f.globalAlpha = 1, f.drawImage(c, 15, r - 10 - 24 - 5));
+    ib();
     b = Date.now() - b;
     b > 1E3 / 60 ? z -= .01 : b < 1E3 / 65 && (z += .01);.4 > z && (z = .4);
     1 < z && (z = 1)
   }
 
-  function db() {
-    g.fillStyle = ia ? "#111111" : "#F2FBFF";
-    g.fillRect(0, 0, q, r);
-    g.save();
-    g.strokeStyle = ia ? "#AAAAAA" : "#000000";
-    g.globalAlpha = .2;
-    g.scale(k, k);
-    for (var a = q / k, b = r / k, c = -.5 + (-t + a / 2) % 50; c < a; c += 50) g.beginPath(), g.moveTo(c, 0), g.lineTo(c, b), g.stroke();
-    for (c = -.5 + (-u +
-        b / 2) % 50; c < b; c += 50) g.beginPath(), g.moveTo(0, c), g.lineTo(a, c), g.stroke();
-    g.restore()
+  function gb() {
+    f.fillStyle = la ? "#111111" : "#F2FBFF";
+    f.fillRect(0, 0, q, r);
+    f.save();
+    f.strokeStyle = la ? "#AAAAAA" : "#000000";
+    f.globalAlpha = .2;
+    f.scale(k, k);
+    for (var a = q / k, b = r / k, c = -.5 + (-t + a / 2) % 50; c < a; c += 50) f.beginPath(), f.moveTo(c, 0), f.lineTo(c, b), f.stroke();
+    for (c = -.5 + (-u + b / 2) % 50; c < b; c += 50) f.beginPath(), f.moveTo(0, c), f.lineTo(a, c), f.stroke();
+    f.restore()
   }
 
-  function fb() {
-    if (Aa && xa.width) {
+  function ib() {
+    if (Da && Aa.width) {
       var a = q / 5;
-      g.drawImage(xa, 5, 5, a, a)
+      f.drawImage(Aa, 5, 5, a, a)
     }
   }
 
-  function eb() {
+  function hb() {
     for (var a = 0, b = 0; b < p.length; b++) a += p[b].n * p[b].n;
     return a
   }
 
-  function Ka() {
+  function Na() {
     x = null;
     if (null != y || 0 != B.length)
-      if (null != y || la) {
+      if (null != y || oa) {
         x = document.createElement("canvas");
         var a = x.getContext("2d"),
           b = 60,
@@ -891,11 +897,12 @@ api.agar.init = function(util, math) {
         a.font = "30px Ubuntu";
         a.fillText(c, 100 - a.measureText(c).width / 2, 40);
         if (null == y)
-          for (a.font = "20px Ubuntu", b = 0; b < B.length; ++b) c = B[b].name || "An unnamed cell", la || (c = "An unnamed cell"), -1 != G.indexOf(B[b].id) ? (p[0].name && (c = p[0].name), a.fillStyle = "#FFAAAA") : a.fillStyle = "#FFFFFF", c = b + 1 + ". " + c, a.fillText(c, 100 - a.measureText(c).width / 2, 70 + 24 * b);
+          for (a.font = "20px Ubuntu", b = 0; b < B.length; ++b) c = B[b].name || "An unnamed cell", oa || (c = "An unnamed cell"), -1 != G.indexOf(B[b].id) ? (p[0].name && (c = p[0].name), a.fillStyle = "#FFAAAA") : a.fillStyle = "#FFFFFF", c = b + 1 +
+            ". " + c, a.fillText(c, 100 - a.measureText(c).width / 2, 70 + 24 * b);
         else
           for (b = c = 0; b < y.length; ++b) {
             var d = c + y[b] * Math.PI * 2;
-            a.fillStyle = gb[b + 1];
+            a.fillStyle = jb[b + 1];
             a.beginPath();
             a.moveTo(100, 140);
             a.arc(100, 140, 80, c, d, !1);
@@ -905,7 +912,7 @@ api.agar.init = function(util, math) {
       }
   }
 
-  function La(a, b, c, d, e, l) {
+  function Oa(a, b, c, d, e, l) {
     this.id = a;
     this.p = this.x = b;
     this.q = this.y = c;
@@ -917,17 +924,17 @@ api.agar.init = function(util, math) {
     this.Z(l)
   }
 
-  function ka(a, b, c, d) {
+  function na(a, b, c, d) {
     a && (this.r = a);
     b && (this.N = b);
     this.P = !!c;
     d && (this.s = d)
   }
-  var aa = f.location.protocol,
-    Xa = "https:" == aa;
-  if (f.location.ancestorOrigins && f.location.ancestorOrigins.length && "https://apps.facebook.com" != f.location.ancestorOrigins[0]) f.top.location = "http://agar.io/";
+  var ba = g.location.protocol,
+    $a = "https:" == ba;
+  if (g.location.ancestorOrigins && g.location.ancestorOrigins.length && "https://apps.facebook.com" != g.location.ancestorOrigins[0]) g.top.location = "http://agar.io/";
   else {
-    var na, g, C, q, r, O = null,
+    var qa, f, C, q, r, O = null,
       s = null,
       t = 0,
       u = 0,
@@ -937,46 +944,46 @@ api.agar.init = function(util, math) {
       v = [],
       I = [],
       B = [],
-      U = 0,
       V = 0,
-      Y = -1,
+      W = 0,
       Z = -1,
-      cb = 0,
+      $ = -1,
+      fb = 0,
       H = 0,
       F = null,
-      ea = 0,
-      fa = 0,
-      ga = 1E4,
-      ha = 1E4,
+      ha = 0,
+      ia = 0,
+      ja = 1E4,
+      ka = 1E4,
       k = 1,
       w = null,
-      Pa = !0,
-      la = !0,
-      ya = !1,
-      ua = !1,
+      Sa = !0,
+      oa = !0,
+      Ba = !1,
+      xa = !1,
       J = 0,
-      ia = !1,
-      Qa = !1,
-      Q = t = ~~((ea + ga) / 2),
-      R = u = ~~((fa + ha) / 2),
-      S = 1,
-      P = "",
+      la = !1,
+      Ta = !1,
+      R = t = ~~((ha + ja) / 2),
+      S = u = ~~((ia + ka) / 2),
+      T = 1,
+      Q = "",
       y = null,
-      ma = !1,
-      ta = !1,
-      ra = 0,
-      sa = 0,
-      ca = 0,
-      da = 0,
-      Ra = 0,
-      gb = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
+      pa = !1,
       wa = !1,
-      qa = !1,
+      ua = 0,
+      va = 0,
+      fa = 0,
+      ga = 0,
+      P = 0,
+      jb = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
+      za = !1,
+      ta = !1,
       E = 1,
-      Aa = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      xa = new Image;
-    xa.src = "img/split.png";
-    var Sa = document.createElement("canvas");
+      Da = "ontouchstart" in g && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      Aa = new Image;
+    Aa.src = "img/split.png";
+    var Ua = document.createElement("canvas");
 
     api.agar.getWindowCenterCoord = function() {  // meow
       // please search some line like:
@@ -1021,53 +1028,56 @@ api.agar.init = function(util, math) {
       }
       api.agar._circlesInfoChanged = false;
     };
-
-    if ("undefined" == typeof console ||
-      "undefined" == typeof DataView || "undefined" == typeof WebSocket || null == Sa || null == Sa.getContext || null == f.localStorage) alert("You browser does not support this game, we recommend you to use Firefox to play this");
+    if ("undefined" == typeof console || "undefined" == typeof DataView || "undefined" == typeof WebSocket || null == Ua || null == Ua.getContext || null == g.localStorage) alert("You browser does not support this game, we recommend you to use Firefox to play this");
     else {
-      var $ = null;
-      f.setNick = function(a) {
-        Ga();
-        F = a;
+      var aa = null;
+      g.setNick = function(a) {
         Ja();
+        F = a;
+        Ma();
         J = 0
       };
-      f.setRegion = W;
-      f.setSkins = function(a) {
-        Pa = a
+      g.setRegion = X;
+      g.setSkins = function(a) {
+        Sa = a
       };
-      f.setNames = function(a) {
+      g.setNames = function(a) {
+        oa = a
+      };
+      g.setDarkTheme = function(a) {
         la = a
       };
-      f.setDarkTheme = function(a) {
-        ia = a
+      g.setColors = function(a) {
+        Ba = a
       };
-      f.setColors = function(a) {
-        ya = a
+      g.setShowMass = function(a) {
+        Ta = a
       };
-      f.setShowMass = function(a) {
-        Qa = a
-      };
-      f.spectate = function() {
+      g.spectate = function() {
         F = null;
         D(1);
-        Ga()
+        Ja()
       };
-      f.setGameMode = function(a) {
-        a != P && (P = a, X())
+      g.setGameMode = function(a) {
+        a != Q && (Q = a, Y())
       };
-      f.setAcid = function(a) {
-        wa = a
+      g.setAcid = function(a) {
+        za = a
       };
-      null != f.localStorage && (null == f.localStorage.AB8 && (f.localStorage.AB8 = 0 + ~~(100 * Math.random())), Ra = +f.localStorage.AB8, f.ABGroup = Ra);
-      m.get(aa + "//gc.agar.io", function(a) {
+      null != g.localStorage && (null == g.localStorage.AB9 && (g.localStorage.AB9 = 0 + ~~(100 * Math.random())), P = +g.localStorage.AB9, g.ABGroup = P);
+      m.get(ba + "//gc.agar.io", function(a) {
         var b = a.split(" ");
         a = b[0];
-        b = b[1] || ""; - 1 == ["UA"].indexOf(a) && Ta.push("ussr");
-        T.hasOwnProperty(a) && ("string" == typeof T[a] ? w || W(T[a]) : T[a].hasOwnProperty(b) && (w || W(T[a][b])))
+        b = b[1] || ""; - 1 == ["UA"].indexOf(a) && Va.push("ussr");
+        U.hasOwnProperty(a) && ("string" == typeof U[a] ? w || X(U[a]) : U[a].hasOwnProperty(b) && (w || X(U[a][b])))
       }, "text");
-      setTimeout(function() {}, 3E5);
-      var T = {
+      var ca = !1,
+        da = 0;
+      25 > P ? da = 10 : 50 > P && (da = 5);
+      setTimeout(function() {
+        ca = !0
+      }, Math.max(6E4 * da, 1E4));
+      var U = {
         AF: "JP-Tokyo",
         AX: "EU-London",
         AL: "EU-London",
@@ -1371,18 +1381,18 @@ api.agar.init = function(util, math) {
         ZM: "EU-London",
         ZW: "EU-London"
       };
-      f.connect = Ia;
-      var ba = 500,
-        Ma = -1,
-        Na = -1,
+      g.connect = La;
+      var ea = 500,
+        Pa = -1,
+        Qa = -1,
         x = null,
         z = 1,
-        ja = null,
+        ma = null,
         M = {},
-        Ta = "poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;chaplin;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;doge;nasa;byzantium;imperial japan;french kingdom;somalia;turkey;mars;pokerface;8;irs;receita federal;facebook".split(";"),
-        hb = ["8", "nasa"],
-        ib = ["m'blob"];
-      La.prototype = {
+        Va = "poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;chaplin;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;doge;nasa;byzantium;imperial japan;french kingdom;somalia;turkey;mars;pokerface;8;irs;receita federal;facebook".split(";"),
+        kb = ["8", "nasa"],
+        lb = ["m'blob"];
+      Oa.prototype = {
         id: 0,
         a: null,
         l: null,
@@ -1414,7 +1424,7 @@ api.agar.init = function(util, math) {
               break
             }
           delete A[this.id];
-          a = p.indexOf(this); - 1 != a && (ua = !0, p.splice(a, 1));
+          a = p.indexOf(this); - 1 != a && (xa = !0, p.splice(a, 1));
           a = G.indexOf(this.id); - 1 != a && G.splice(a, 1);
           this.A = !0;
           I.push(this)
@@ -1423,7 +1433,7 @@ api.agar.init = function(util, math) {
           return Math.max(~~(.3 * this.size), 24)
         },
         Z: function(a) {
-          if (this.name = a) null == this.k ? this.k = new ka(this.h(), "#FFFFFF", !0, "#000000") : this.k.H(this.h()), this.k.u(this.name)
+          if (this.name = a) null == this.k ? this.k = new na(this.h(), "#FFFFFF", !0, "#000000") : this.k.H(this.h()), this.k.u(this.name)
         },
         R: function() {
           for (var a = this.C(); this.a.length > a;) {
@@ -1483,7 +1493,7 @@ api.agar.init = function(util, math) {
                 function(a) {
                   a.Q != h && 25 > (p - a.x) * (p - a.x) + (q - a.y) * (q - a.y) && (m = !0)
                 });
-              !m && (a[d].x < ea || a[d].y < fa || a[d].x > ga || a[d].y > ha) && (m = !0);
+              !m && (a[d].x < ha || a[d].y < ia || a[d].x > ja || a[d].y > ka) && (m = !0);
               m && (0 < b[d] && (b[d] = 0), b[d] -= 1)
             }
             f += b[d];
@@ -1532,7 +1542,7 @@ api.agar.init = function(util, math) {
             a.lineWidth = 10;
             a.lineCap = "round";
             a.lineJoin = this.d ? "miter" : "round";
-            ya ? (a.fillStyle = "#FFFFFF", a.strokeStyle = "#AAAAAA") : (a.fillStyle = this.color, a.strokeStyle = this.color);
+            Ba ? (a.fillStyle = "#FFFFFF", a.strokeStyle = "#AAAAAA") : (a.fillStyle = this.color, a.strokeStyle = this.color);
             if (b) a.beginPath(), a.arc(this.x, this.y, this.size + 5, 0, 2 * Math.PI, !1);
             else {
               this.ha();
@@ -1546,18 +1556,18 @@ api.agar.init = function(util, math) {
             }
             a.closePath();
             d = this.name.toLowerCase();
-            !this.j && Pa && ":teams" != P ? -1 != Ta.indexOf(d) ? (M.hasOwnProperty(d) || (M[d] = new Image, M[d].src = "skins/" + d + ".png"), c = 0 != M[d].width && M[d].complete ? M[d] : null) : c = null : c = null;
-            c = (e = c) ? -1 != ib.indexOf(d) : !1;
+            !this.j && Sa && ":teams" != Q ? -1 != Va.indexOf(d) ? (M.hasOwnProperty(d) || (M[d] = new Image, M[d].src = "skins/" + d + ".png"), c = 0 != M[d].width && M[d].complete ? M[d] : null) : c = null : c = null;
+            c = (e = c) ? -1 != lb.indexOf(d) : !1;
             b || a.stroke();
             a.fill();
             null == e || c || (a.save(), a.clip(), a.drawImage(e, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size), a.restore());
-            (ya || 15 < this.size) && !b && (a.strokeStyle = "#000000", a.globalAlpha *= .1, a.stroke());
+            (Ba || 15 < this.size) && !b && (a.strokeStyle = "#000000", a.globalAlpha *= .1, a.stroke());
             a.globalAlpha = 1;
             null != e && c && a.drawImage(e, this.x - 2 * this.size, this.y - 2 * this.size, 4 * this.size, 4 * this.size);
             c = -1 != p.indexOf(this);
             if (0 != this.id) {
               b = ~~this.y;
-              if ((la || c) && this.name && this.k && (null == e || -1 == hb.indexOf(d))) {
+              if ((oa || c) && this.name && this.k && (null == e || -1 == kb.indexOf(d))) {
                 e = this.k;
                 e.u(this.name);
                 e.H(this.h());
@@ -1569,14 +1579,14 @@ api.agar.init = function(util, math) {
                 a.drawImage(e, ~~this.x - ~~(l / 2), b - ~~(h / 2), l, h);
                 b += e.height / 2 / d + 4
               }
-              Qa && (c || 0 == p.length && (!this.d || this.j) && 20 < this.size) && (null == this.J && (this.J = new ka(this.h() / 2, "#FFFFFF", !0, "#000000")), c = this.J, c.H(this.h() / 2), c.u(~~(this.size * this.size / 100)), d = Math.ceil(10 * k) / 10, c.$(d), e = c.G(), l = ~~(e.width / d), h = ~~(e.height / d), a.drawImage(e, ~~this.x - ~~(l / 2), b - ~~(h / 2),
+              Ta && (c || 0 == p.length && (!this.d || this.j) && 20 < this.size) && (null == this.J && (this.J = new na(this.h() / 2, "#FFFFFF", !0, "#000000")), c = this.J, c.H(this.h() / 2), c.u(~~(this.size * this.size / 100)), d = Math.ceil(10 * k) / 10, c.$(d), e = c.G(), l = ~~(e.width / d), h = ~~(e.height / d), a.drawImage(e, ~~this.x - ~~(l / 2), b - ~~(h / 2),
                 l, h))
             }
             a.restore()
           }
         }
       };
-      ka.prototype = {
+      na.prototype = {
         w: "",
         N: "#000000",
         P: !1,
@@ -1627,7 +1637,7 @@ api.agar.init = function(util, math) {
       Date.now || (Date.now = function() {
         return (new Date).getTime()
       });
-      var Wa = {
+      var Ya = {
         ca: function(a) {
           function b(a, b, c, d, e) {
             this.x = a;
@@ -1728,8 +1738,7 @@ api.agar.init = function(util, math) {
           }
         }
       };
-      f.onload = Ua
-      Ua();  // meow, Go!!
+      Wa();  // meow, Go!!
     }
   }
 };
