@@ -68,7 +68,8 @@ ai.GongJiGuay.prototype.getAttackTargetPosition = function(agent, foods) {
         dist = foods[i].center.minus(agent.circles[0].center).length();
         console.log(dist);
         if (dist < 600) {
-          ret = foods[i].center.clone();  
+          ret = foods[i].center.clone() + foods[i].velocity.times(foods[i].center.radius);
+          console.log(ret.x + ', ' +  ret.y);
           break;
         }
       }

@@ -58,7 +58,7 @@ ai.JiaoDuGuay.prototype.getJiaoDu = function(agent, foods, oppns, spikes) {
   }
 
   ret =  new math.Vector2D(Math.cos(maxAng), Math.sin(maxAng))
-                 .timesToThis(me.radius * 3)
+                 .timesToThis(me.radius * 5)
                  .addToThis(this._origin);
   ret.x = Math.max(0, ret.x);
   ret.y = Math.max(0, ret.y);

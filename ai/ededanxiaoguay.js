@@ -23,7 +23,7 @@ ai.EDeDanXiaoGuay.prototype.run = function() {
   var foods = api.getFoods();
   var spikes = api.getSpikes();
 
-  var esc = this.getEscapePosition(agent, opponents, spikes);
+  var esc = this.getEscapePosition2(agent, opponents, spikes);
   var target;
   if (esc !== false) {
     target = esc;
@@ -66,9 +66,14 @@ ai.EDeDanXiaoGuay.prototype.getEscapePosition = function(agent, oppns, spikes) {
   }
   if (needToEscape) {
     if (vsum.length() > 0.00001) {
-      vsum.normalizeToThis().timesToThis(agent.circles[0].radius * 2);
+      vsum.normalizeToThis().timesToThis(agent.circles[0].radius * 3);
     }
-    return agent.circles[0].center.add(vsum);
+    var pos = agent.circles[0].center.add(vsum);
+    pos.x = pos.x < 0 ? 0 : pos.x;
+    pos.y = pos.y < 0 ? 0 : pos.y;
+    pos.x = pos.x > 11180 ? 11180 : pos.x;
+    pos.y = pos.y > 11180 ? 11180 : pos.y;
+    return pos
   } else {
     return false;
   }
@@ -98,10 +103,11 @@ ai.EDeDanXiaoGuay.prototype.getEscapePosition2 = function(agent, oppns, spikes) 
   var myRadius = agent.circles[0].radius;
 
   var boundary = [];
-  boundary.push(new math.Vector2D(0 + myRadius / 2, agent.circles[0].center.y))
-  boundary.push(new math.Vector2D(11180 - myRadius / 2, agent.circles[0].center.y))
-  boundary.push(new math.Vector2D(agent.circles[0].center.x, 0 + myRadius / 2))
-  boundary.push(new math.Vector2D(agent.circles[0].center.y, 11180 - myRadius / 2))
+  boundary.push(new math.Vector2D(0 + myRadius / 2 + 50, agent.circles[0].center.y))
+  boundary.push(new math.Vector2D(11180 - myRadius / 2 - 50, agent.circles[0].center.y))
+  boundary.push(new math.Vector2D(agent.circles[0].center.x + 50, 0 + myRadius / 2))
+  boundary.push(new math.Vector2D(agent.circles[0].center.y - 50, 11180 - myRadius / 2))
+ /* 
   for (var i = 0; needToEscape === true && i < 4; i ++) {
     //! console.log(agent.circles[0].center.minus(boundary[i]).length())
     bad = api.getDangerRadius();
@@ -110,6 +116,7 @@ ai.EDeDanXiaoGuay.prototype.getEscapePosition2 = function(agent, oppns, spikes) 
       update(delta.normalize(), 2 * (bad - delta.length()) / bad)
     }
   }
+ */ 
 
 
 
@@ -122,11 +129,19 @@ ai.EDeDanXiaoGuay.prototype.getEscapePosition2 = function(agent, oppns, spikes) 
   }
   if (needToEscape) {
      if (vsum.length() > 0.00001) {
-       vsum.normalizeToThis().timesToThis(agent.circles[0].radius * 4);
+        vsum.normalizeToThis().timesToThis(agent.circles[0].radius * 4);
      }
     //! console.log(agent.circles[0].center.add(vsum).x)
     //! console.log(agent.circles[0].center.add(vsum).y)
-    return agent.circles[0].center.add(vsum);
+    
+    //check target position 
+    var pos = agent.circles[0].center.add(vsum);
+
+    pos.x = pos.x < 0 ? 0 : pos.x;
+    pos.y = pos.y < 0 ? 0 : pos.y;
+    pos.x = pos.x > 11180 ? 11180 : pos.x;
+    pos.y = pos.y > 11180 ? 11180 : pos.y;
+    return pos;
   } else {
     return false;
   }
